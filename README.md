@@ -228,12 +228,3 @@ Utilizes Git Flow with the following branch conventions:
 * **Database Scaling:** Implement read replicas for the search module.
 * **Monitoring:** Collect per-module metrics.
 
----
-
-This architecture strikes a balance between simplicity and modularity, facilitating rapid development while providing a clear pathway for future scalability. The C4 model documentation ensures all stakeholders have a clear understanding of the system at the appropriate level of abstraction.
-
----
-
-**Note:** To visualize the C4 diagrams, ensure that the corresponding images (`system-context.png`, `container.png`, `booking-component.png`) are generated using PlantUML or a similar tool and placed in the `docs/diagrams/` directory.
-
----
