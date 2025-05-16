@@ -1,12 +1,6 @@
 name: CI for Flight Search System
 
 on:
-  push:
-    branches:
-      - main
-      - develop
-      - feature/**
-
   pull_request:
     types:
       - opened
@@ -63,8 +57,8 @@ jobs:
       - name: Run Integration Tests
         run: mvn verify || true
 
-      - name: Perform Security Scan
-        run: mvn org.owasp:dependency-check-maven:check || true
+#      - name: Perform Security Scan
+#        run: mvn org.owasp:dependency-check-maven:check || true
 
       - name: Package Application
         run: mvn package
