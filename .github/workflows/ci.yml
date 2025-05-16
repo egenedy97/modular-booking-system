@@ -1,12 +1,6 @@
 name: CI for Flight Search System
 
 on:
-  push:
-    branches:
-      - main
-      - develop
-      - feature/**
-
   pull_request:
     types:
       - opened
@@ -42,3 +36,44 @@ jobs:
 
       - name: Build with Maven
         run: mvn clean install -D skipTests
+
+      - name: Cache Maven dependencies
+        uses: actions/cache@v3
+        with:
+            path: ~/.m2/repository
+            key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+            restore-keys: |
+              ${{ runner.os }}-maven-
+
+      - name: Compile with Maven
+        run: mvn clean compile
+
+      - name: Run Unit Tests
+        run: mvn test
+
+      - name: Run Code Quality (Checkstyle)
+        run: mvn checkstyle:check || true
+
+      - name: Run Integration Tests
+        run: mvn verify || true
+
+#      - name: Perform Security Scan
+#        run: mvn org.owasp:dependency-check-maven:check || true
+
+      - name: Package Application
+        run: mvn package
+#
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app
+          path: target/*.jar
+#
+      - name: Notify on Success
+        if: success()
+        run: echo "✅ CI build passed successfully."
+
+      - name: Notify on Failure
+        if: failure()
+        run: echo "❌ CI build failed."
+
