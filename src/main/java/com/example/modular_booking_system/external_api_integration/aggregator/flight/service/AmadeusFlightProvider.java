@@ -1,7 +1,7 @@
-package com.example.modular_booking_system.external_api_integration.aggregator.service;
+package com.example.modular_booking_system.external_api_integration.aggregator.flight.service;
 
-import com.example.modular_booking_system.external_api_integration.amadeus.dto.FlightOffer;
-import com.example.modular_booking_system.external_api_integration.amadeus.service.AmadeusFlightSearchService;
+import com.example.modular_booking_system.external_api_integration.amadeus.flight.search.dto.FlightOffer;
+import com.example.modular_booking_system.external_api_integration.amadeus.flight.search.service.AmadeusFlightSearchService;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;

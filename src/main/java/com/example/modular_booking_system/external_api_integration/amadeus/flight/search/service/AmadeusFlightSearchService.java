@@ -1,12 +1,12 @@
-package com.example.modular_booking_system.external_api_integration.amadeus.service;
+package com.example.modular_booking_system.external_api_integration.amadeus.flight.search.service;
 
 import com.amadeus.Amadeus;
 import com.amadeus.Params;
 import com.amadeus.exceptions.ResponseException;
 import com.amadeus.resources.FlightOfferSearch;
-import com.example.modular_booking_system.external_api_integration.amadeus.exception.AmadeusErrorHandler;
-import com.example.modular_booking_system.external_api_integration.amadeus.dto.FlightOffer;
-import com.example.modular_booking_system.external_api_integration.amadeus.exception.FlightSearchException;
+import com.example.modular_booking_system.external_api_integration.amadeus.flight.search.exception.AmadeusErrorHandler;
+import com.example.modular_booking_system.external_api_integration.amadeus.flight.search.dto.FlightOffer;
+import com.example.modular_booking_system.external_api_integration.amadeus.flight.search.exception.FlightSearchException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

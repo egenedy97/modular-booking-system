@@ -1,7 +1,7 @@
-package com.example.modular_booking_system.external_api_integration.amadeus.controller;
+package com.example.modular_booking_system.external_api_integration.amadeus.flight.search.controller;
 
-import com.example.modular_booking_system.external_api_integration.amadeus.dto.FlightOffer;
-import com.example.modular_booking_system.external_api_integration.amadeus.service.AmadeusFlightSearchService;
+import com.example.modular_booking_system.external_api_integration.amadeus.flight.search.dto.FlightOffer;
+import com.example.modular_booking_system.external_api_integration.amadeus.flight.search.service.AmadeusFlightSearchService;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

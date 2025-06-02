@@ -1,7 +1,7 @@
-package com.example.modular_booking_system.external_api_integration.amadeus.service;
+package com.example.modular_booking_system.external_api_integration.amadeus.flight.search.service;
 
 import com.amadeus.resources.FlightOfferSearch;
-import com.example.modular_booking_system.external_api_integration.amadeus.dto.*;
+import com.example.modular_booking_system.external_api_integration.amadeus.flight.search.dto.*;
 
 import java.util.ArrayList;
 import java.util.List;
