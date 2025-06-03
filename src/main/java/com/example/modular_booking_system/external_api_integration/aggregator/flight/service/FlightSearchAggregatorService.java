@@ -1,6 +1,6 @@
 package com.example.modular_booking_system.external_api_integration.aggregator.flight.service;
 
-import com.example.modular_booking_system.external_api_integration.amadeus.flight.search.dto.FlightOffer;
+import com.example.modular_booking_system.external_api_integration.amadeus.flight.search.payload.FlightOffer;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -11,10 +11,10 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 public class FlightSearchAggregatorService {
-    private final List<FlightProvider> flightProviders;
+    private final List<FlightSearchProvider> flightSearchProviders;
 
-    public FlightSearchAggregatorService(List<FlightProvider> flightProviders) {
-        this.flightProviders = flightProviders;
+    public FlightSearchAggregatorService(List<FlightSearchProvider> flightSearchProviders) {
+        this.flightSearchProviders = flightSearchProviders;
     }
 
     public List<FlightOffer> searchAllProviders(
@@ -28,7 +28,7 @@ public class FlightSearchAggregatorService {
         List<CompletableFuture<List<FlightOffer>>> futures = new ArrayList<>();
 
         // Scatter: Send requests to all providers
-        for (FlightProvider provider : flightProviders) {
+        for (FlightSearchProvider provider : flightSearchProviders) {
             futures.add(provider.searchFlights(origin, destination, departureDate, returnDate, adults, max));
         }
 
@@ -37,7 +37,7 @@ public class FlightSearchAggregatorService {
 
         try {
             // Wait for all providers to respond (with timeout)
-            allOf.get(5, TimeUnit.SECONDS);
+            allOf.get(10, TimeUnit.SECONDS);
 
             // Combine results
             List<FlightOffer> allResults = new ArrayList<>();

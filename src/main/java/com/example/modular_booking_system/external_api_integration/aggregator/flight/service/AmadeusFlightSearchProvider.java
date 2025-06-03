@@ -1,6 +1,6 @@
 package com.example.modular_booking_system.external_api_integration.aggregator.flight.service;
 
-import com.example.modular_booking_system.external_api_integration.amadeus.flight.search.dto.FlightOffer;
+import com.example.modular_booking_system.external_api_integration.amadeus.flight.search.payload.FlightOffer;
 import com.example.modular_booking_system.external_api_integration.amadeus.flight.search.service.AmadeusFlightSearchService;
 import org.springframework.stereotype.Component;
 
@@ -9,12 +9,12 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 @Component
-public class AmadeusFlightProvider implements FlightProvider {
+public class AmadeusFlightSearchProvider implements FlightSearchProvider {
 
-    private final AmadeusFlightSearchService flightSearchService;
+    private final AmadeusFlightSearchService amadeusFlightSearchService;
 
-    public AmadeusFlightProvider(AmadeusFlightSearchService flightSearchService) {
-        this.flightSearchService = flightSearchService;
+    public AmadeusFlightSearchProvider(AmadeusFlightSearchService amadeusFlightSearchService) {
+        this.amadeusFlightSearchService = amadeusFlightSearchService;
     }
 
     @Override
@@ -27,7 +27,7 @@ public class AmadeusFlightProvider implements FlightProvider {
             Integer max
     ) {
         return CompletableFuture.supplyAsync(() ->
-                flightSearchService.searchFlights(origin, destination, departureDate, returnDate, adults, max)
+                amadeusFlightSearchService.searchFlights(origin, destination, departureDate, returnDate, adults, max)
         );
     }
 }

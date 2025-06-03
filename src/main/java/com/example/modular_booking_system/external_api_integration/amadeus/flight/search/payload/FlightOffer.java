@@ -1,4 +1,4 @@
-package com.example.modular_booking_system.external_api_integration.amadeus.flight.search.dto;
+package com.example.modular_booking_system.external_api_integration.amadeus.flight.search.payload;
 
 import lombok.Data;
 
