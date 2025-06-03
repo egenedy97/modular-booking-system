@@ -24,8 +24,6 @@ jobs:
 
   build-the-application:
     runs-on: ubuntu-latest
-    env:
-      SPRING_APPLICATION_NAME: modular-booking-system
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
