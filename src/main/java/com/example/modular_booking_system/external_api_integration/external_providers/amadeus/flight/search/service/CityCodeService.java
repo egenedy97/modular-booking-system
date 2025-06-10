@@ -1,4 +1,4 @@
-package com.example.modular_booking_system.external_api_integration.amadeus.flight.search.service;
+package com.example.modular_booking_system.external_api_integration.external_providers.amadeus.flight.search.service;
 
 import com.amadeus.Amadeus;
 import com.amadeus.Params;
