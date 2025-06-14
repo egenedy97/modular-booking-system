@@ -1,7 +1,7 @@
 package com.example.modular_booking_system.external_api_integration.aggregator.flight.controller;
 
 import com.example.modular_booking_system.external_api_integration.aggregator.flight.service.FlightSearchAggregatorService;
-import com.example.modular_booking_system.external_api_integration.amadeus.flight.search.payload.FlightOffer;
+import com.example.modular_booking_system.external_api_integration.external_providers.amadeus.flight.search.payload.FlightOffer;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +21,7 @@ public class FlightSearchController {
     }
 
     //localhost:8090/api/v1/flights/search?origin=CAI&destination=LON&departureDate=2025-06-01&returnDate=2025-06-10&adults=1&max=5
+    //localhost:8090/api/v1/amadeus/flights/search?origin=CAI&destination=LON&departureDate=2025-06-10&returnDate=2025-06-20&adults=1&max=5
     @GetMapping("/search")
     public ResponseEntity<List<FlightOffer>> searchFlights(
             @RequestParam String origin,

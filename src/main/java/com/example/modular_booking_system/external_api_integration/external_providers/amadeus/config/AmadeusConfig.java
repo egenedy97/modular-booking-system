@@ -1,4 +1,4 @@
-package com.example.modular_booking_system.external_api_integration.amadeus.config;
+package com.example.modular_booking_system.external_api_integration.external_providers.amadeus.config;
 
 import com.amadeus.Amadeus;
 import org.springframework.beans.factory.annotation.Value;
