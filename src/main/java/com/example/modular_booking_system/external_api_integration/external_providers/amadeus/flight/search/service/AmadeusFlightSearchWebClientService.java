@@ -1,9 +1,9 @@
 package com.example.modular_booking_system.external_api_integration.external_providers.amadeus.flight.search.service;
 
 import com.example.modular_booking_system.external_api_integration.external_providers.amadeus.flight.search.exception.FlightSearchException;
+import com.example.modular_booking_system.external_api_integration.external_providers.amadeus.shared.AccessTokenService;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -16,19 +16,15 @@ public class AmadeusFlightSearchWebClientService {
 
     // WebClient instance for making HTTP requests
     private final WebClient webClient;
+    private final AccessTokenService accessTokenService;
     private final String amadeusApiUrl = "https://test.api.amadeus.com/v2/shopping/flight-offers";
-    private final String authUrl = "https://test.api.amadeus.com/v1/security/oauth2/token";
 
-    @Value("${amadeus.api.key}")
-    private String apiKey;
-
-    @Value("${amadeus.api.secret}")
-    private String apiSecret;
 
 
     @Autowired
-    public AmadeusFlightSearchWebClientService(WebClient webClient) {
+    public AmadeusFlightSearchWebClientService(WebClient webClient, AccessTokenService accessTokenService) {
         this.webClient = webClient;
+        this.accessTokenService = accessTokenService;
     }
 
     public JsonNode searchFlights(String originLocationCode,
@@ -39,7 +35,7 @@ public class AmadeusFlightSearchWebClientService {
                                              Integer max) {
         try {
             // Obtain OAuth2 access token
-            String accessToken = fetchAccessToken();
+            String accessToken = accessTokenService.fetchAccessToken();
 
             // Build the request URL with query parameters
             UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(amadeusApiUrl)
@@ -76,22 +72,6 @@ public class AmadeusFlightSearchWebClientService {
             return response;
         } catch (Exception e) {
             throw new FlightSearchException("Unexpected error while searching flights", e);
-        }
-    }
-
-    private String fetchAccessToken() {
-        try {
-            // Make POST request to obtain access token
-            JsonNode response = webClient.post()
-                    .uri(authUrl)
-                    .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                    .bodyValue("grant_type=client_credentials&client_id=" + apiKey + "&client_secret=" + apiSecret)
-                    .retrieve()
-                    .bodyToMono(JsonNode.class)
-                    .block();
-            return response.get("access_token").asText();
-        } catch (Exception e) {
-            throw new FlightSearchException("Failed to fetch Amadeus access token", e);
         }
     }
 

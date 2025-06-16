@@ -15,16 +15,14 @@ import java.time.LocalDate;
 @RestController
 @RequestMapping("/api/v2/amadeus/flights")
 public class AmadeusFlightSearchWebClientController {
-    private final AmadeusFlightSearchWebClientService amadeusFlightSearchWebClientService;
-    private final CityCodeService cityCodeService;
 
-    public AmadeusFlightSearchWebClientController(AmadeusFlightSearchWebClientService amadeusFlightSearchWebClientService
-            , CityCodeService cityCodeService) {
+    private final AmadeusFlightSearchWebClientService amadeusFlightSearchWebClientService;
+
+    public AmadeusFlightSearchWebClientController(AmadeusFlightSearchWebClientService amadeusFlightSearchWebClientService) {
         this.amadeusFlightSearchWebClientService = amadeusFlightSearchWebClientService;
-        this.cityCodeService = cityCodeService;
     }
 
-    //localhost:8090/api/v2/amadeus/flights/search?origin=CAI&destination=LON&departureDate=2025-06-10&returnDate=2025-06-20&adults=1&max=5
+    //localhost:8090/api/v2/amadeus/flights/search?origin=CAI&destination=LON&departureDate=2025-06-20&returnDate=2025-06-25&adults=1&max=5
     @GetMapping("/search")
     public ResponseEntity<JsonNode> searchFlights(
             @RequestParam String origin,

@@ -1,4 +1,4 @@
-package com.example.modular_booking_system.external_api_integration.config;
+package com.example.modular_booking_system.core.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
