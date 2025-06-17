@@ -1,4 +1,4 @@
-package com.example.modular_booking_system.external_api_integration.amadeus.flight.search.exception;
+package com.example.modular_booking_system.external_api_integration.external_providers.amadeus.flight.search.exception;
 
 public class FlightSearchException extends RuntimeException {
     public FlightSearchException(String message) {
