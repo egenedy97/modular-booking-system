@@ -37,7 +37,7 @@ public class FlightSearchAggregatorService {
 
         try {
             // Wait for all providers to respond (with timeout)
-            allOf.get(5, TimeUnit.SECONDS);
+            allOf.get(10, TimeUnit.SECONDS);
 
             // Combine results
             List<FlightOffer> allResults = new ArrayList<>();
