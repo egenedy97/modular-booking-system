@@ -1,13 +1,12 @@
 package com.example.modular_booking_system.external_api_integration.aggregator.flight.service;
 
-import com.example.modular_booking_system.external_api_integration.external_providers.amadeus.flight.search.payload.FlightOffer;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
 public interface FlightSearchProvider {
-    CompletableFuture<List<FlightOffer>> searchFlights(
+    CompletableFuture<JsonNode> searchFlights(
             String origin,
             String destination,
             LocalDate departureDate,
