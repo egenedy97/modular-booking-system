@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
 
@@ -22,6 +23,7 @@ public class AmadeusFlightSearchController {
     }
 
     //localhost:8090/api/v1/amadeus/flights/search?origin=CAI&destination=LON&departureDate=2025-07-01&returnDate=2025-07-10&adults=1&max=5
+    // Blocking endpoint
     @GetMapping("/search")
     public ResponseEntity<JsonNode> searchFlights(
             @RequestParam String origin,
@@ -40,6 +42,27 @@ public class AmadeusFlightSearchController {
                 max
         );
         return ResponseEntity.ok(response);
+    }
+
+    //localhost:8090/api/v1/amadeus/flights/search/reactive?origin=CAI&destination=LON&departureDate=2025-07-01&returnDate=2025-07-10&adults=1&max=5
+    // Non-blocking reactive endpoint
+    @GetMapping("/search/reactive")
+    public Mono<ResponseEntity<JsonNode>> searchFlightsReactive(
+            @RequestParam String origin,
+            @RequestParam String destination,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate departureDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate returnDate,
+            @RequestParam(defaultValue = "1") Integer adults,
+            @RequestParam(defaultValue = "10") Integer max) {
+
+        return amadeusFlightSearchService.searchFlightsNonBlocking(
+                origin,
+                destination,
+                departureDate,
+                returnDate,
+                adults,
+                max
+        ).map(ResponseEntity::ok);
     }
 
 

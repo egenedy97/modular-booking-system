@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriComponentsBuilder;
+import reactor.core.publisher.Mono;
 
 import java.time.LocalDate;
 
@@ -73,6 +74,39 @@ public class AmadeusFlightSearchService {
         } catch (Exception e) {
             throw new FlightSearchException("Unexpected error while searching flights", e);
         }
+    }
+
+    public Mono<JsonNode> searchFlightsNonBlocking(String originLocationCode,
+                                        String destinationLocationCode,
+                                        LocalDate departureDate,
+                                        LocalDate returnDate,
+                                        Integer adults,
+                                        Integer max) {
+        return Mono.fromCallable(() -> accessTokenService.fetchAccessToken())
+                .flatMap(accessToken -> {
+                    UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(amadeusApiUrl)
+                            .queryParam("originLocationCode", originLocationCode)
+                            .queryParam("destinationLocationCode", destinationLocationCode)
+                            .queryParam("departureDate", departureDate.toString())
+                            .queryParam("adults", adults)
+                            .queryParam("max", max)
+                            .queryParam("currencyCode", "USD")
+                            .queryParam("nonStop", "false")
+                            .queryParam("travelClass", "ECONOMY");
+
+                    if (returnDate != null) {
+                        builder.queryParam("returnDate", returnDate.toString());
+                    }
+
+                    return webClient.get()
+                            .uri(builder.toUriString())
+                            .accept(MediaType.APPLICATION_JSON)
+                            .header("Authorization", "Bearer " + accessToken)
+                            .retrieve()
+                            .bodyToMono(JsonNode.class)
+                            .switchIfEmpty(Mono.error(new FlightSearchException("No flights found")));
+                })
+                .onErrorMap(e -> new FlightSearchException("Error searching flights", e));
     }
 
 
