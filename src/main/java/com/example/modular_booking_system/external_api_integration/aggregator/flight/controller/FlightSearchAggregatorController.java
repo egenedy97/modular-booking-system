@@ -14,11 +14,11 @@ import java.time.LocalDate;
 
 @RestController
 @RequestMapping("/api/v1/flights")
-public class FlightSearchController {
+public class FlightSearchAggregatorController {
 
     private final FlightSearchAggregatorService flightSearchAggregatorService;
 
-    public FlightSearchController(FlightSearchAggregatorService flightSearchAggregatorService) {
+    public FlightSearchAggregatorController(FlightSearchAggregatorService flightSearchAggregatorService) {
         this.flightSearchAggregatorService = flightSearchAggregatorService;
     }
 
