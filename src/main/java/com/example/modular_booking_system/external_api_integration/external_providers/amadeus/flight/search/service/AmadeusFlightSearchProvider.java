@@ -2,19 +2,17 @@ package com.example.modular_booking_system.external_api_integration.external_pro
 
 import com.example.modular_booking_system.external_api_integration.aggregator.flight.service.FlightSearchProvider;
 import com.fasterxml.jackson.databind.JsonNode;
+    import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
 import java.util.concurrent.CompletableFuture;
 
 @Component
+@RequiredArgsConstructor
 public class AmadeusFlightSearchProvider implements FlightSearchProvider {
 
     private final AmadeusFlightSearchService amadeusFlightSearchService;
-
-    public AmadeusFlightSearchProvider(AmadeusFlightSearchService amadeusFlightSearchService) {
-        this.amadeusFlightSearchService = amadeusFlightSearchService;
-    }
 
     @Override
     public CompletableFuture<JsonNode> searchFlights(

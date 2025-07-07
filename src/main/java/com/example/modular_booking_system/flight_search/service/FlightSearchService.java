@@ -3,18 +3,16 @@ package com.example.modular_booking_system.flight_search.service;
 import com.example.modular_booking_system.external_api_integration.aggregator.flight.service.FlightSearchAggregatorService;
 import com.example.modular_booking_system.flight_search.model.FlightSearchResult;
 import com.fasterxml.jackson.databind.JsonNode;
+import lombok.RequiredArgsConstructor;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 
 @Service
+@RequiredArgsConstructor
 public class FlightSearchService {
 
-    private FlightSearchAggregatorService flightSearchAggregatorService;
-
-    public FlightSearchService(FlightSearchAggregatorService flightSearchAggregatorService) {
-        this.flightSearchAggregatorService = flightSearchAggregatorService;
-    }
+    private final FlightSearchAggregatorService flightSearchAggregatorService;
 
     @Cacheable(value = "flightSearchCache",
             key = "#origin + '_' + #destination + '_' + #departureDate + '_' + #returnDate + '_' + #adults + '_' + #max",
