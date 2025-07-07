@@ -1,0 +1,199 @@
+package com.example.modular_booking_system.payment.service.impl;
+
+import com.example.modular_booking_system.payment.config.PayPalConfig.PayPalProperties;
+import com.example.modular_booking_system.payment.dto.paypal.*;
+import com.example.modular_booking_system.payment.exception.PaymentException;
+import com.example.modular_booking_system.payment.model.PaymentDetails;
+import com.example.modular_booking_system.payment.service.PaymentService;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.stereotype.Service;
+import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.reactive.function.client.WebClientResponseException;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.time.Instant;
+import java.util.Collections;
+import java.util.UUID;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class PayPalServiceImpl implements PaymentService {
+
+    private final WebClient webClient;
+    private final String paypalAuthHeader;
+    private final PayPalProperties payPalProperties;
+    
+    private String accessToken;
+    private long tokenExpiryTime;
+
+    @Override
+    public PaymentDetails createPayment(
+            Double total,
+            String currency,
+            String method,
+            String intent,
+            String description,
+            String cancelUrl,
+            String successUrl) throws PaymentException {
+        
+        // Ensure we have a valid access token
+        String token = getAccessToken();
+        
+        // Format total amount
+        BigDecimal totalAmount = BigDecimal.valueOf(total).setScale(2, RoundingMode.HALF_UP);
+        
+        // Create order request
+        PayPalCreateOrderRequest request = new PayPalCreateOrderRequest();
+        request.setIntent(intent);
+        
+        // Create purchase unit
+        PurchaseUnit purchaseUnit = new PurchaseUnit();
+        purchaseUnit.setDescription(description);
+        purchaseUnit.setReference_id(UUID.randomUUID().toString());
+        
+        // Set amount
+        PurchaseUnit.Amount amount = PurchaseUnit.Amount.of(currency, totalAmount.doubleValue());
+        purchaseUnit.setAmount(amount);
+        
+        // Add item
+        PurchaseUnit.Item item = new PurchaseUnit.Item();
+        item.setName("Booking Payment");
+        item.setDescription(description);
+        item.setQuantity("1");
+        item.setUnit_amount(new PurchaseUnit.UnitAmount(currency, totalAmount.toString()));
+        purchaseUnit.setItems(Collections.singletonList(item));
+        
+        request.setPurchaseUnits(Collections.singletonList(purchaseUnit));
+        
+        // Set application context
+        PayPalCreateOrderRequest.ApplicationContext applicationContext = 
+            new PayPalCreateOrderRequest.ApplicationContext();
+        applicationContext.setReturn_url(successUrl);
+        applicationContext.setCancel_url(cancelUrl);
+        applicationContext.setBrand_name("Booking System");
+        applicationContext.setLanding_page("NO_PREFERENCE");
+        request.setApplicationContext(applicationContext);
+        
+        try {
+            // Make API call to create order
+            PayPalOrderResponse orderResponse = webClient.post()
+                    .uri(payPalProperties.baseUrl() + "/v2/checkout/orders")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(request)
+                    .retrieve()
+                    .bodyToMono(PayPalOrderResponse.class)
+                    .block();
+            
+            if (orderResponse != null && orderResponse.getId() != null) {
+                // Create payment details from the response
+                PaymentDetails paymentDetails = PaymentDetails.builder()
+                    .id(orderResponse.getId())
+                    .state(orderResponse.getStatus())
+                    .intent(intent)
+                    .approvalUrl(orderResponse.getApprovalLink())
+                    .cancelUrl(cancelUrl)
+                    .returnUrl(successUrl)
+                    .createTime(Instant.now().toString())
+                    .build();
+                
+                // Set amount details
+                PaymentDetails.Amount amountDetails = PaymentDetails.Amount.builder()
+                    .currency(currency)
+                    .total(totalAmount)
+                    .details(PaymentDetails.Amount.Details.builder()
+                        .subtotal(totalAmount)
+                        .shipping(BigDecimal.ZERO)
+                        .tax(BigDecimal.ZERO)
+                        .build())
+                    .build();
+                paymentDetails.setAmount(amountDetails);
+                
+                return paymentDetails;
+            }
+            
+            throw new PaymentException("Failed to create PayPal order");
+            
+        } catch (WebClientResponseException e) {
+            String errorMsg = "Failed to create PayPal order: " + e.getResponseBodyAsString();
+            log.error(errorMsg, e);
+            throw new PaymentException(errorMsg, e);
+        } catch (Exception e) {
+            log.error("Error creating PayPal order", e);
+            throw new PaymentException("Failed to create PayPal order: " + e.getMessage(), e);
+        }
+    }
+
+    @Override
+    public PaymentDetails executePayment(String paymentId, String payerId) throws PaymentException {
+        try {
+            String token = getAccessToken();
+            
+            // Execute payment
+            webClient.post()
+                    .uri(payPalProperties.baseUrl() + "/v2/checkout/orders/" + paymentId + "/capture")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .retrieve()
+                    .bodyToMono(String.class)
+                    .block();
+            
+            // Create and return payment details
+            return PaymentDetails.builder()
+                .id(paymentId)
+                .state("COMPLETED")
+                .updateTime(Instant.now().toString())
+                .payer(PaymentDetails.Payer.builder()
+                    .paymentMethod("paypal")
+                    .status("VERIFIED")
+                    .payerId(payerId)
+                    .build())
+                .build();
+            
+        } catch (WebClientResponseException e) {
+            String errorMsg = "Failed to execute PayPal payment: " + e.getResponseBodyAsString();
+            log.error(errorMsg, e);
+            throw new PaymentException(errorMsg, e);
+        } catch (Exception e) {
+            log.error("Error executing PayPal payment", e);
+            throw new PaymentException("Failed to execute PayPal payment: " + e.getMessage(), e);
+        }
+    }
+
+    private synchronized String getAccessToken() throws PaymentException {
+        // Check if token is still valid (with 5-minute buffer)
+        if (accessToken != null && System.currentTimeMillis() < tokenExpiryTime - 300000) {
+            return accessToken;
+        }
+
+        try {
+            // Request new access token
+            PayPalTokenResponse tokenResponse = webClient.post()
+                    .uri(payPalProperties.baseUrl() + "/v1/oauth2/token")
+                    .header(HttpHeaders.AUTHORIZATION, paypalAuthHeader)
+                    .header(HttpHeaders.CONTENT_TYPE, "application/x-www-form-urlencoded")
+                    .bodyValue("grant_type=client_credentials")
+                    .retrieve()
+                    .bodyToMono(PayPalTokenResponse.class)
+                    .block();
+
+            if (tokenResponse != null && tokenResponse.getAccessToken() != null) {
+                this.accessToken = tokenResponse.getAccessToken();
+                // Set token expiry time (with 5-minute buffer)
+                this.tokenExpiryTime = System.currentTimeMillis() + (tokenResponse.getExpiresIn() * 1000L);
+                return this.accessToken;
+            }
+
+            throw new PaymentException("Failed to get PayPal access token");
+
+        } catch (Exception e) {
+            log.error("Error getting PayPal access token", e);
+            throw new PaymentException("Failed to get PayPal access token: " + e.getMessage(), e);
+        }
+    }
+}
