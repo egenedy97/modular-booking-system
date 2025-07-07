@@ -3,7 +3,8 @@ package com.example.modular_booking_system.external_api_integration.external_pro
 import com.example.modular_booking_system.external_api_integration.external_providers.amadeus.flight.search.exception.FlightSearchException;
 import com.example.modular_booking_system.external_api_integration.external_providers.amadeus.shared.AccessTokenService;
 import com.fasterxml.jackson.databind.JsonNode;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -13,20 +14,16 @@ import reactor.core.publisher.Mono;
 import java.time.LocalDate;
 
 @Service
+@RequiredArgsConstructor
 public class AmadeusFlightSearchService {
 
     // WebClient instance for making HTTP requests
     private final WebClient webClient;
     private final AccessTokenService accessTokenService;
-    private final String amadeusApiUrl = "https://test.api.amadeus.com/v2/shopping/flight-offers";
 
+    @Value("${amadeus.api.flight-search-url}")
+    private String flightSearchUrl;
 
-
-    @Autowired
-    public AmadeusFlightSearchService(WebClient webClient, AccessTokenService accessTokenService) {
-        this.webClient = webClient;
-        this.accessTokenService = accessTokenService;
-    }
 
     public JsonNode searchFlights(String originLocationCode,
                                              String destinationLocationCode,
@@ -36,10 +33,10 @@ public class AmadeusFlightSearchService {
                                              Integer max) {
         try {
             // Obtain OAuth2 access token
-            String accessToken = accessTokenService.fetchAccessToken();
+            String accessToken = accessTokenService.getAccessToken();
 
             // Build the request URL with query parameters
-            UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(amadeusApiUrl)
+            UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(flightSearchUrl)
                     .queryParam("originLocationCode", originLocationCode)
                     .queryParam("destinationLocationCode", destinationLocationCode)
                     .queryParam("departureDate", departureDate.toString())
@@ -82,9 +79,9 @@ public class AmadeusFlightSearchService {
                                         LocalDate returnDate,
                                         Integer adults,
                                         Integer max) {
-        return Mono.fromCallable(() -> accessTokenService.fetchAccessToken())
+        return Mono.fromCallable(() -> accessTokenService.getAccessToken())
                 .flatMap(accessToken -> {
-                    UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(amadeusApiUrl)
+                    UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(flightSearchUrl)
                             .queryParam("originLocationCode", originLocationCode)
                             .queryParam("destinationLocationCode", destinationLocationCode)
                             .queryParam("departureDate", departureDate.toString())

@@ -6,36 +6,33 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Service
+@RequiredArgsConstructor
 public class AmadeusFlightPricingService {
 
     private final WebClient webClient;
     private final AccessTokenService accessTokenService;
-    private final String amadeusApiUrl="https://test.api.amadeus.com/v1/shopping/flight-offers/pricing";
     private final ObjectMapper mapper;
 
-    @Autowired
-    public AmadeusFlightPricingService (WebClient webClient, AccessTokenService accessTokenService, ObjectMapper mapper) {
-        this.webClient = webClient;
-        this.accessTokenService = accessTokenService;
-        this.mapper = mapper;
-    }
+    @Value("${amadeus.api.flight-pricing-url}")
+    private String flightPricingUrl;
 
     public JsonNode confirmPrice(JsonNode flightOffer) {
         // Obtain OAuth2 access token
-        String accessToken = accessTokenService.fetchAccessToken();
+        String accessToken = accessTokenService.getAccessToken();
 
         // Create pricing request
         JsonNode pricingRequest = createPricingRequest(flightOffer);
 
         try {
             return webClient.post()
-                    .uri(amadeusApiUrl)
+                    .uri(flightPricingUrl)
                     .header("Authorization", "Bearer " + accessToken)
                     .contentType(MediaType.APPLICATION_JSON)
                     .bodyValue(pricingRequest)

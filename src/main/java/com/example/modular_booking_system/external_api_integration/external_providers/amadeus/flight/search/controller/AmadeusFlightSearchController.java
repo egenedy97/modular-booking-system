@@ -2,6 +2,7 @@ package com.example.modular_booking_system.external_api_integration.external_pro
 
 import com.example.modular_booking_system.external_api_integration.external_providers.amadeus.flight.search.service.AmadeusFlightSearchService;
 import com.fasterxml.jackson.databind.JsonNode;
+import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,14 +14,11 @@ import reactor.core.publisher.Mono;
 import java.time.LocalDate;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/v1/amadeus/flights")
 public class AmadeusFlightSearchController {
 
     private final AmadeusFlightSearchService amadeusFlightSearchService;
-
-    public AmadeusFlightSearchController(AmadeusFlightSearchService amadeusFlightSearchService) {
-        this.amadeusFlightSearchService = amadeusFlightSearchService;
-    }
 
     //localhost:8090/api/v1/amadeus/flights/search?origin=CAI&destination=LON&departureDate=2025-07-01&returnDate=2025-07-10&adults=1&max=5
     // Blocking endpoint

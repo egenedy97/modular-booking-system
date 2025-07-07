@@ -4,16 +4,14 @@ import com.amadeus.Amadeus;
 import com.amadeus.Params;
 import com.amadeus.exceptions.ResponseException;
 import com.amadeus.resources.Location;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 @Service
+@RequiredArgsConstructor
 public class CityCodeService {
 
     private final Amadeus amadeus;
-
-    public CityCodeService(Amadeus amadeus) {
-        this.amadeus = amadeus;
-    }
 
     public String getCityCode(String cityName) {
         try {

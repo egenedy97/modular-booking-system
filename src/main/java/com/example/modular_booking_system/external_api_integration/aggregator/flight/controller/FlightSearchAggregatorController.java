@@ -2,6 +2,7 @@ package com.example.modular_booking_system.external_api_integration.aggregator.f
 
 import com.example.modular_booking_system.external_api_integration.aggregator.flight.service.FlightSearchAggregatorService;
 import com.fasterxml.jackson.databind.JsonNode;
+import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,17 +14,13 @@ import java.time.LocalDate;
 
 
 @RestController
-@RequestMapping("/api/v1/flights")
+@RequiredArgsConstructor
+@RequestMapping("/api/v1/flights/aggregator")
 public class FlightSearchAggregatorController {
 
     private final FlightSearchAggregatorService flightSearchAggregatorService;
 
-    public FlightSearchAggregatorController(FlightSearchAggregatorService flightSearchAggregatorService) {
-        this.flightSearchAggregatorService = flightSearchAggregatorService;
-    }
-
-    //localhost:8090/api/v1/flights/search?origin=CAI&destination=LON&departureDate=2025-07-01&returnDate=2025-07-10&adults=1&max=5
-    //localhost:8090/api/v1/amadeus/flights/search?origin=CAI&destination=LON&departureDate=2025-07-01&returnDate=2025-07-10&adults=1&max=5
+    //localhost:8090/api/v1/flights/aggregator/search?origin=CAI&destination=LON&departureDate=2025-07-01&returnDate=2025-07-10&adults=1&max=5
     @GetMapping("/search")
     public ResponseEntity<JsonNode> searchFlights(
             @RequestParam String origin,

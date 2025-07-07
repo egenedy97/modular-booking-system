@@ -2,17 +2,20 @@ package com.example.modular_booking_system.external_api_integration.external_pro
 
 import com.example.modular_booking_system.external_api_integration.external_providers.amadeus.flight.search.exception.FlightSearchException;
 import com.fasterxml.jackson.databind.JsonNode;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.actuate.autoconfigure.metrics.MetricsProperties;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 
 @Service
+@RequiredArgsConstructor
 public class AccessTokenService {
 
     private final WebClient webClient;
-    private final String authUrl="https://test.api.amadeus.com/v1/security/oauth2/token";
+
+    @Value("${amadeus.api.auth-url}")
+    private String authUrl;
 
     @Value("${amadeus.api.key}")
     private String apiKey;
@@ -20,13 +23,16 @@ public class AccessTokenService {
     @Value("${amadeus.api.secret}")
     private String apiSecret;
 
-    public AccessTokenService(WebClient webClient) {
-        this.webClient = webClient;
-    }
+    // Token cache fields
+    private String accessToken;
+    private long tokenExpiryTime;
 
-    public String fetchAccessToken() {
+    public synchronized String getAccessToken() {
+        long buffer = 5 * 60 * 1000; // 5 minutes buffer
+        if (accessToken != null && System.currentTimeMillis() < tokenExpiryTime - buffer) {
+            return accessToken;
+        }
         try {
-            // Make POST request to obtain access token
             JsonNode response = webClient.post()
                     .uri(authUrl)
                     .contentType(MediaType.APPLICATION_FORM_URLENCODED)
@@ -34,7 +40,10 @@ public class AccessTokenService {
                     .retrieve()
                     .bodyToMono(JsonNode.class)
                     .block();
-            return response.get("access_token").asText();
+            this.accessToken = response.get("access_token").asText();
+            int expiresIn = response.get("expires_in").asInt(); // Should be 1799
+            this.tokenExpiryTime = System.currentTimeMillis() + (expiresIn * 1000L);
+            return this.accessToken;
         } catch (Exception e) {
             throw new FlightSearchException("Failed to fetch Amadeus access token", e);
         }

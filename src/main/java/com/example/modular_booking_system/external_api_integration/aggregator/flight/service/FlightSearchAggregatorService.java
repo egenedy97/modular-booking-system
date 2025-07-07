@@ -3,6 +3,7 @@ package com.example.modular_booking_system.external_api_integration.aggregator.f
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -12,14 +13,10 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
 @Service
+@RequiredArgsConstructor
 public class FlightSearchAggregatorService {
     private final List<FlightSearchProvider> flightSearchProviders;
     private final ObjectMapper mapper;
-
-    public FlightSearchAggregatorService(List<FlightSearchProvider> flightSearchProviders, ObjectMapper mapper) {
-        this.flightSearchProviders = flightSearchProviders;
-        this.mapper = mapper;
-    }
 
     public JsonNode searchAllProviders(
             String origin,
