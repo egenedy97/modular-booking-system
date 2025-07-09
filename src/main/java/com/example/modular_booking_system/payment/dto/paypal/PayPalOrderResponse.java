@@ -1,7 +1,6 @@
 package com.example.modular_booking_system.payment.dto.paypal;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.util.List;

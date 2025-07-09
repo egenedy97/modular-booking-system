@@ -126,7 +126,7 @@ public class PaymentDetails {
         /**
          * The details of the amount.
          */
-        private Details details;
+//        private Details details;
         
         /**
          * Represents the details of the amount.
