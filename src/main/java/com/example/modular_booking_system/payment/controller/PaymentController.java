@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.view.RedirectView;
 
 import jakarta.servlet.http.HttpServletRequest;
 
@@ -19,12 +18,13 @@ public class PaymentController {
 
     private final PaymentService paymentService;
 
+    // localhost:8090/api/payment/pay?amount=10.00&currency=USD&method=paypal&intent=CAPTURE&description=Test payment
     @PostMapping("/pay")
     public ResponseEntity<?> createPayment(
             @RequestParam("amount") double amount,
             @RequestParam("currency") String currency,
             @RequestParam(value = "method", defaultValue = "paypal") String method,
-            @RequestParam(value = "intent", defaultValue = "sale") String intent,
+            @RequestParam(value = "intent", defaultValue = "capture") String intent,
             @RequestParam("description") String description,
             HttpServletRequest request) {
         
