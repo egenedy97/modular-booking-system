@@ -5,6 +5,7 @@ import com.example.modular_booking_system.payment.dto.paypal.*;
 import com.example.modular_booking_system.payment.exception.PaymentException;
 import com.example.modular_booking_system.payment.model.PaymentDetails;
 import com.example.modular_booking_system.payment.service.PaymentService;
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -102,8 +103,8 @@ public class PayPalServiceImpl implements PaymentService {
 
         // Create and add item details
         PurchaseUnit.Item item = new PurchaseUnit.Item();
-        item.setName("Booking Payment");
-        item.setDescription(description);
+        item.setName("Booking");
+        item.setDescription("Hotel reservation");
         item.setQuantity("1");
         item.setUnit_amount(new PurchaseUnit.UnitAmount(currency, totalAmount.toString()));
         purchaseUnit.setItems(Collections.singletonList(item));
@@ -165,30 +166,31 @@ public class PayPalServiceImpl implements PaymentService {
     }
 
     @Override
-    public PaymentDetails executePayment(String paymentId, String payerId) throws PaymentException {
+    public JsonNode executePayment(String paymentId, String payerId) throws PaymentException {
         try {
             String token = getAccessToken();
             
             // Execute payment
-            webClient.post()
+            JsonNode response = webClient.post()
                     .uri(payPalProperties.baseUrl() + "/v2/checkout/orders/" + paymentId + "/capture")
                     .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
                     .contentType(MediaType.APPLICATION_JSON)
                     .retrieve()
-                    .bodyToMono(String.class)
+                    .bodyToMono(JsonNode.class)
                     .block();
-            
+
+            return response;
             // Create and return payment details
-            return PaymentDetails.builder()
-                .id(paymentId)
-                .state("COMPLETED")
-                .updateTime(Instant.now().toString())
-                .payer(PaymentDetails.Payer.builder()
-                    .paymentMethod("paypal")
-                    .status("VERIFIED")
-                    .payerId(payerId)
-                    .build())
-                .build();
+//            return PaymentDetails.builder()
+//                .id(paymentId)
+//                .state("COMPLETED")
+//                .updateTime(Instant.now().toString())
+//                .payer(PaymentDetails.Payer.builder()
+//                    .paymentMethod("paypal")
+//                    .status("VERIFIED")
+//                    .payerId(payerId)
+//                    .build())
+//                .build();
             
         } catch (WebClientResponseException e) {
             String errorMsg = "Failed to execute PayPal payment: " + e.getResponseBodyAsString();

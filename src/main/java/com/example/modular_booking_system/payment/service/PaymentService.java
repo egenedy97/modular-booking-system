@@ -2,6 +2,7 @@ package com.example.modular_booking_system.payment.service;
 
 import com.example.modular_booking_system.payment.exception.PaymentException;
 import com.example.modular_booking_system.payment.model.PaymentDetails;
+import com.fasterxml.jackson.databind.JsonNode;
 
 public interface PaymentService {
     /**
@@ -32,5 +33,5 @@ public interface PaymentService {
      * @return Payment details with execution status
      * @throws PaymentException if there's an error executing the payment
      */
-    PaymentDetails executePayment(String paymentId, String payerId) throws PaymentException;
+    JsonNode executePayment(String paymentId, String payerId) throws PaymentException;
 }

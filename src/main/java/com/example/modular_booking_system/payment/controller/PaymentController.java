@@ -3,6 +3,7 @@ package com.example.modular_booking_system.payment.controller;
 import com.example.modular_booking_system.payment.exception.PaymentException;
 import com.example.modular_booking_system.payment.model.PaymentDetails;
 import com.example.modular_booking_system.payment.service.PaymentService;
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -59,30 +60,28 @@ public class PaymentController {
     }
 
     @GetMapping("/success")
-    public ResponseEntity<?> paymentSuccess(
-            @RequestParam("paymentId") String paymentId,
-            @RequestParam("PayerID") String payerId) throws PaymentException {
-        
-        log.info("Processing successful payment. Payment ID: {}, Payer ID: {}", paymentId, payerId);
-        
+    public ResponseEntity<?> paymentSuccess(@RequestParam("token") String orderId) throws PaymentException {
+        log.info("Processing approved payment. Order ID: {}", orderId);
+
         try {
-            PaymentDetails paymentDetails = paymentService.executePayment(paymentId, payerId);
-            
-            if ("COMPLETED".equalsIgnoreCase(paymentDetails.getState())) {
-                log.info("Payment {} executed successfully", paymentId);
-                return ResponseEntity.ok(paymentDetails);
-            } else {
-                log.warn("Payment {} execution failed. State: {}", paymentId, paymentDetails.getState());
-                return ResponseEntity.badRequest()
-                        .body("Payment processing failed. Status: " + paymentDetails.getState());
-            }
-            
+            JsonNode response = paymentService.executePayment(orderId, null); // payerId not needed
+            return ResponseEntity.ok(response);
+//            if ("COMPLETED".equalsIgnoreCase(paymentDetails.getState())) {
+//                log.info("Payment {} executed successfully", orderId);
+//                return ResponseEntity.ok(paymentDetails);
+//            } else {
+//                log.warn("Payment {} execution failed. State: {}", orderId, paymentDetails.getState());
+//                return ResponseEntity.badRequest()
+//                        .body("Payment failed. Status: " + paymentDetails.getState());
+//            }
+
         } catch (Exception e) {
-            log.error("Error executing payment {}: {}", paymentId, e.getMessage(), e);
+            log.error("Error executing payment {}: {}", orderId, e.getMessage(), e);
             return ResponseEntity.internalServerError()
-                    .body("An error occurred while processing your payment: " + e.getMessage());
+                    .body("Error occurred: " + e.getMessage());
         }
     }
+
 
     @GetMapping("/cancel")
     public ResponseEntity<?> paymentCancel(@RequestParam(value = "token") String token) {
