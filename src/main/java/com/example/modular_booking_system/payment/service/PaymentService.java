@@ -2,7 +2,6 @@ package com.example.modular_booking_system.payment.service;
 
 import com.example.modular_booking_system.payment.exception.PaymentException;
 import com.example.modular_booking_system.payment.model.PaymentDetails;
-import com.fasterxml.jackson.databind.JsonNode;
 
 public interface PaymentService {
     /**
@@ -27,11 +26,21 @@ public interface PaymentService {
         String successUrl) throws PaymentException;
 
     /**
+     * Gets the details of an order
+     * @param orderId The order ID from PayPal
+     * @return The payment details
+     * @throws PaymentException if there's an error getting the order details
+     */
+    PaymentDetails getOrderDetails(String orderId) throws PaymentException;
+
+    /**
      * Executes an approved payment
      * @param paymentId The payment ID from PayPal
      * @param payerId The Payer ID from PayPal
      * @return Payment details with execution status
      * @throws PaymentException if there's an error executing the payment
      */
-    JsonNode executePayment(String paymentId, String payerId) throws PaymentException;
+    PaymentDetails executePayment(String paymentId, String payerId) throws PaymentException;
+
+
 }

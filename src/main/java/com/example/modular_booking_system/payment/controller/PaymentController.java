@@ -2,8 +2,9 @@ package com.example.modular_booking_system.payment.controller;
 
 import com.example.modular_booking_system.payment.exception.PaymentException;
 import com.example.modular_booking_system.payment.model.PaymentDetails;
-import com.example.modular_booking_system.payment.service.PaymentService;
-import com.fasterxml.jackson.databind.JsonNode;
+import com.example.modular_booking_system.payment.service_new.PayPalPayment;
+import com.fasterxml.jackson.databind.node.JsonNodeFactory;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +18,7 @@ import jakarta.servlet.http.HttpServletRequest;
 @RequiredArgsConstructor
 public class PaymentController {
 
-    private final PaymentService paymentService;
+    private final PayPalPayment paymentService;
 
     // localhost:8090/api/payment/pay?amount=10.00&currency=USD&method=paypal&intent=CAPTURE&description=Test payment
     @PostMapping("/pay")
@@ -64,7 +65,7 @@ public class PaymentController {
         log.info("Processing approved payment. Order ID: {}", orderId);
 
         try {
-            JsonNode response = paymentService.executePayment(orderId, null); // payerId not needed
+            PaymentDetails response = paymentService.executePayment(orderId, null); // payerId not needed
             return ResponseEntity.ok(response);
 //            if ("COMPLETED".equalsIgnoreCase(paymentDetails.getState())) {
 //                log.info("Payment {} executed successfully", orderId);
@@ -79,6 +80,23 @@ public class PaymentController {
             log.error("Error executing payment {}: {}", orderId, e.getMessage(), e);
             return ResponseEntity.internalServerError()
                     .body("Error occurred: " + e.getMessage());
+        }
+    }
+    // http://localhost:8090/api/payment/details?orderId=ORDER_ID
+    @GetMapping("/details")
+    public ResponseEntity<?> getPaymentDetails(@RequestParam("orderId") String orderId) {
+        try {
+            PaymentDetails orderDetails = paymentService.getOrderDetails(orderId);
+            return ResponseEntity.ok(orderDetails);
+        } catch (PaymentException e) {
+            log.error("Payment failed: {}", e.getMessage());
+
+            // Create a proper JSON error response
+            ObjectNode errorNode = JsonNodeFactory.instance.objectNode();
+            errorNode.put("status", "error");
+            errorNode.put("message", "Payment failed: " + e.getMessage());
+
+            return ResponseEntity.badRequest().body(errorNode);
         }
     }
 
