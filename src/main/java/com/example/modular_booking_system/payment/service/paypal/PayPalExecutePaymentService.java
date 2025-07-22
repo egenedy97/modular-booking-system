@@ -1,8 +1,10 @@
 package com.example.modular_booking_system.payment.service.paypal;
 
+import com.example.modular_booking_system.core.events.PaymentAuditEvent;
 import com.example.modular_booking_system.payment.config.PayPalConfig;
 import com.example.modular_booking_system.payment.exception.PaymentException;
 import com.example.modular_booking_system.payment.model.PaymentDetails;
+import com.example.modular_booking_system.payment.service.AuditEventPublisher;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,6 +16,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -24,10 +27,25 @@ public class PayPalExecutePaymentService {
     private final PayPalAccessTokenService accessTokenService;
     private final PayPalConfig.PayPalProperties payPalProperties;
 
+    private final AuditEventPublisher auditEventPublisher;
+
     public PaymentDetails executePayment(String paymentId, String payerId) throws PaymentException {
         try {
             JsonNode response = capturePayment(paymentId);
-            return buildPaymentDetailsFromCapture(response);
+
+            PaymentDetails paymentDetails = buildPaymentDetailsFromCapture(response);
+
+            // Add audit event
+            auditEventPublisher.publish(new PaymentAuditEvent(
+                    "PAYMENT_COMPLETED",
+                    paymentDetails.getId(),
+                    paymentDetails.getPayer().getPayerId(),
+                    paymentDetails.getAmount().getTotal(),
+                    LocalDateTime.now()
+            ));
+
+            return paymentDetails;
+
         } catch (WebClientResponseException e) {
             String errorMsg = "Failed to execute PayPal payment: " + e.getResponseBodyAsString();
             log.error(errorMsg, e);

@@ -1,11 +1,13 @@
 package com.example.modular_booking_system.payment.service.paypal;
 
+import com.example.modular_booking_system.core.events.PaymentAuditEvent;
 import com.example.modular_booking_system.payment.config.PayPalConfig;
 import com.example.modular_booking_system.payment.dto.paypal.PayPalCreateOrderRequest;
 import com.example.modular_booking_system.payment.dto.paypal.PayPalOrderResponse;
 import com.example.modular_booking_system.payment.dto.paypal.PurchaseUnit;
 import com.example.modular_booking_system.payment.exception.PaymentException;
 import com.example.modular_booking_system.payment.model.PaymentDetails;
+import com.example.modular_booking_system.payment.service.AuditEventPublisher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -17,6 +19,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.UUID;
 
@@ -28,6 +31,8 @@ public class PayPalCreatePaymentService {
     private final WebClient webClient;
     private final PayPalAccessTokenService accessTokenService;
     private final PayPalConfig.PayPalProperties payPalProperties;
+
+    private final AuditEventPublisher auditEventPublisher;
 
 
     public PaymentDetails createPayment(
@@ -55,7 +60,18 @@ public class PayPalCreatePaymentService {
 
             // If order creation is successful, map the response to our internal PaymentDetails object
             if (orderResponse != null && orderResponse.getId() != null) {
-                return buildPaymentDetails(orderResponse, totalAmount, currency, intent, cancelUrl, successUrl);
+                PaymentDetails paymentDetails = buildPaymentDetails(orderResponse, totalAmount, currency, intent, cancelUrl, successUrl);
+
+                auditEventPublisher.publish(new PaymentAuditEvent(
+                        "PAYMENT_CREATED",
+                        paymentDetails.getId(),
+                        paymentDetails.getPayer() != null ? paymentDetails.getPayer().getPayerId() : "PENDING",
+                        paymentDetails.getAmount().getTotal(),
+                        LocalDateTime.now()
+                ));
+
+                return paymentDetails;
+
             }
 
             // If response is invalid, throw an exception
@@ -175,6 +191,10 @@ public class PayPalCreatePaymentService {
                 .total(totalAmount)
                 .build();
 
+        PaymentDetails.Payer payer = PaymentDetails.Payer.builder()
+                .payerId("PENDING")  // Default payer ID until payment is approved
+                .build();
+
         return PaymentDetails.builder()
                 .id(orderResponse.getId())
                 .state(orderResponse.getStatus())
@@ -184,6 +204,7 @@ public class PayPalCreatePaymentService {
                 .returnUrl(successUrl)
                 .createTime(Instant.now().toString())
                 .amount(amountDetails)
+                .payer(payer)
                 .build();
     }
 }
