@@ -2,7 +2,7 @@ package com.example.modular_booking_system.payment.controller;
 
 import com.example.modular_booking_system.payment.exception.PaymentException;
 import com.example.modular_booking_system.payment.model.PaymentDetails;
-import com.example.modular_booking_system.payment.service_new.PayPalPayment;
+import com.example.modular_booking_system.payment.service.paypal.PayPalPayment;
 import com.fasterxml.jackson.databind.node.JsonNodeFactory;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.RequiredArgsConstructor;
