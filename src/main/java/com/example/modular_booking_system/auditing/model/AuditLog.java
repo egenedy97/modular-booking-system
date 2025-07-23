@@ -24,6 +24,7 @@ public class AuditLog {
     private String action;
     private String referenceId;
     private String userId;
+    private String username;
     private BigDecimal amount;
     private LocalDateTime timestamp;
 }

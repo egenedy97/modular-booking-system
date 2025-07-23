@@ -25,20 +25,20 @@ public class AuditEventPublisher {
     }
 
     // Publishes an audit event for when a payment is created
-    public void publishPaymentCreated(String action, String paymentId, String userId, BigDecimal amount, LocalDateTime timestamp) {
-        PaymentAuditEvent event = new PaymentAuditEvent(action, paymentId, userId, amount, timestamp);
+    public void publishPaymentCreated(String action, String paymentId, String userId, String username, BigDecimal amount, LocalDateTime timestamp) {
+        PaymentAuditEvent event = new PaymentAuditEvent(action, paymentId, userId,username, amount, timestamp);
         publishPaymentEvent(event);
     }
 
     // Publishes an audit event for when a payment is retrieved
-    public void publishPaymentRetrieved(String action, String paymentId, String userId, BigDecimal amount, LocalDateTime timestamp) {
-        PaymentAuditEvent event = new PaymentAuditEvent(action, paymentId, userId, amount, timestamp);
+    public void publishPaymentRetrieved(String action, String paymentId, String userId, String username, BigDecimal amount, LocalDateTime timestamp) {
+        PaymentAuditEvent event = new PaymentAuditEvent(action, paymentId, userId,username, amount, timestamp);
         publishPaymentEvent(event);
     }
 
     // Publishes an audit event for when a payment is executed
-    public void publishPaymentExecuted(String action, String paymentId, String userId, BigDecimal amount, LocalDateTime timestamp) {
-        PaymentAuditEvent event = new PaymentAuditEvent(action, paymentId, userId, amount, timestamp);
+    public void publishPaymentExecuted(String action, String paymentId, String userId, String username, BigDecimal amount, LocalDateTime timestamp) {
+        PaymentAuditEvent event = new PaymentAuditEvent(action, paymentId, userId,username, amount, timestamp);
         publishPaymentEvent(event);
     }
 

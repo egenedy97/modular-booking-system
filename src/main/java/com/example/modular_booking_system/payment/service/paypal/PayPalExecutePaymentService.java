@@ -17,6 +17,7 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -40,6 +41,7 @@ public class PayPalExecutePaymentService {
                     "PAYMENT_COMPLETED",
                     paymentDetails.getId(),
                     paymentDetails.getPayer().getPayerId(),
+                    Optional.of(paymentDetails.getPayer()).map(PaymentDetails.Payer::getPayerName).orElse("Unknown"),
                     paymentDetails.getAmount().getTotal(),
                     LocalDateTime.now()
             );

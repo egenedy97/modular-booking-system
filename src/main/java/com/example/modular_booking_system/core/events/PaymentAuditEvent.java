@@ -14,6 +14,7 @@ public class PaymentAuditEvent {
     private String action;
     private String paymentId;
     private String userId;
+    private String username;
     private BigDecimal amount;
     private LocalDateTime timestamp;
 }

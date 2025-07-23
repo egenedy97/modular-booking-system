@@ -21,6 +21,7 @@ import java.math.RoundingMode;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -66,6 +67,7 @@ public class PayPalCreatePaymentService {
                 auditEventPublisher.publishPaymentCreated("PAYMENT_CREATED",
                         paymentDetails.getId(),
                         paymentDetails.getPayer() != null ? paymentDetails.getPayer().getPayerId() : "PENDING",
+                        Optional.of(paymentDetails.getPayer()).map(PaymentDetails.Payer::getPayerName).orElse("Unknown"),
                         paymentDetails.getAmount().getTotal(),
                         LocalDateTime.now());
 
