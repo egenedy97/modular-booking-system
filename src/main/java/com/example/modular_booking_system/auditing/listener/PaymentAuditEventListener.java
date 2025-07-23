@@ -23,6 +23,7 @@ public class PaymentAuditEventListener {
                 event.getAction(),
                 event.getPaymentId(),
                 event.getUserId(),
+                event.getUsername(),
                 event.getAmount(),
                 event.getTimestamp()
         ));
