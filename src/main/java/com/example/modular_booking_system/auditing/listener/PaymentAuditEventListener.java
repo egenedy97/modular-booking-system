@@ -10,10 +10,12 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class AuditEventListener {
+public class PaymentAuditEventListener {
 
     private final AuditLogRepository repository;
 
+    // Method that listens for messages from the PAYMENT_AUDIT_QUEUE.
+    // When a PaymentAuditEvent is received, it creates and saves an AuditLog entity.
     @RabbitListener(queues = RabbitMQConfig.PAYMENT_AUDIT_QUEUE)
     public void handleAuditEvent(PaymentAuditEvent event) {
         repository.save(new AuditLog(
