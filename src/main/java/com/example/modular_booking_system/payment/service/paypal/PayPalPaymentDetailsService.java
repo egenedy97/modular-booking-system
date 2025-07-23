@@ -35,13 +35,13 @@ public class PayPalPaymentDetailsService {
             PaymentDetails paymentDetails = buildPaymentDetailsFromResponse(response);
 
             // Add audit event
-            auditEventPublisher.publish(new PaymentAuditEvent(
+            auditEventPublisher.publishPaymentRetrieved(
                     "PAYMENT_DETAILS_RETRIEVED",
                     paymentDetails.getId(),
                     paymentDetails.getPayer() != null ? paymentDetails.getPayer().getPayerId() : "UNKNOWN",
                     paymentDetails.getAmount().getTotal(),
                     LocalDateTime.now()
-            ));
+            );
 
             return paymentDetails;
         } catch (WebClientResponseException e) {

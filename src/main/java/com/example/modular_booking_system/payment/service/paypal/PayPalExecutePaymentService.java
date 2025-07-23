@@ -36,13 +36,13 @@ public class PayPalExecutePaymentService {
             PaymentDetails paymentDetails = buildPaymentDetailsFromCapture(response);
 
             // Add audit event
-            auditEventPublisher.publish(new PaymentAuditEvent(
+            auditEventPublisher.publishPaymentExecuted(
                     "PAYMENT_COMPLETED",
                     paymentDetails.getId(),
                     paymentDetails.getPayer().getPayerId(),
                     paymentDetails.getAmount().getTotal(),
                     LocalDateTime.now()
-            ));
+            );
 
             return paymentDetails;
 

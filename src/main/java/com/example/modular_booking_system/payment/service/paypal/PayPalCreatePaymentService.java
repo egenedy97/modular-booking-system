@@ -45,7 +45,7 @@ public class PayPalCreatePaymentService {
             String successUrl) throws PaymentException {
 
         // Ensure we have a valid PayPal access token
-        String token =accessTokenService.getAccessToken();
+        String token = accessTokenService.getAccessToken();
 
         // Format the total amount with 2 decimal precision
         BigDecimal totalAmount = formatAmount(total);
@@ -62,13 +62,12 @@ public class PayPalCreatePaymentService {
             if (orderResponse != null && orderResponse.getId() != null) {
                 PaymentDetails paymentDetails = buildPaymentDetails(orderResponse, totalAmount, currency, intent, cancelUrl, successUrl);
 
-                auditEventPublisher.publish(new PaymentAuditEvent(
-                        "PAYMENT_CREATED",
+                // Publish audit event
+                auditEventPublisher.publishPaymentCreated("PAYMENT_CREATED",
                         paymentDetails.getId(),
                         paymentDetails.getPayer() != null ? paymentDetails.getPayer().getPayerId() : "PENDING",
                         paymentDetails.getAmount().getTotal(),
-                        LocalDateTime.now()
-                ));
+                        LocalDateTime.now());
 
                 return paymentDetails;
 
