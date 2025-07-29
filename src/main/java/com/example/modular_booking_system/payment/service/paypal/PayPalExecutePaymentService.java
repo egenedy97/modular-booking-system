@@ -1,10 +1,10 @@
 package com.example.modular_booking_system.payment.service.paypal;
 
-import com.example.modular_booking_system.core.events.PaymentAuditEvent;
+import com.example.modular_booking_system.core.config.RabbitMQConfig;
 import com.example.modular_booking_system.payment.config.PayPalConfig;
 import com.example.modular_booking_system.payment.exception.PaymentException;
 import com.example.modular_booking_system.payment.model.PaymentDetails;
-import com.example.modular_booking_system.payment.service.AuditEventPublisher;
+import com.example.modular_booking_system.payment.service.PaymentAuditEventPublisher;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +17,6 @@ import org.springframework.web.reactive.function.client.WebClientResponseExcepti
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -28,7 +27,7 @@ public class PayPalExecutePaymentService {
     private final PayPalAccessTokenService accessTokenService;
     private final PayPalConfig.PayPalProperties payPalProperties;
 
-    private final AuditEventPublisher auditEventPublisher;
+    private final PaymentAuditEventPublisher paymentAuditEventPublisher;
 
     public PaymentDetails executePayment(String paymentId, String payerId) throws PaymentException {
         try {
@@ -37,12 +36,13 @@ public class PayPalExecutePaymentService {
             PaymentDetails paymentDetails = buildPaymentDetailsFromCapture(response);
 
             // Add audit event
-            auditEventPublisher.publishPaymentExecuted(
+            paymentAuditEventPublisher.publishPaymentExecuted(
                     "PAYMENT_COMPLETED",
                     paymentDetails.getId(),
-                    paymentDetails.getPayer().getPayerId(),
-                    Optional.of(paymentDetails.getPayer()).map(PaymentDetails.Payer::getPayerName).orElse("Unknown"),
-                    paymentDetails.getAmount().getTotal(),
+                    "PAYMENT_SERVICE",
+                    RabbitMQConfig.PAYMENT_AUDIT_QUEUE,
+                    paymentDetails,
+                    "SYSTEM",
                     LocalDateTime.now()
             );
 

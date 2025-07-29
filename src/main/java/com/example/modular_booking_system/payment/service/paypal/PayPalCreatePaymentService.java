@@ -1,13 +1,13 @@
 package com.example.modular_booking_system.payment.service.paypal;
 
-import com.example.modular_booking_system.core.events.PaymentAuditEvent;
+import com.example.modular_booking_system.core.config.RabbitMQConfig;
 import com.example.modular_booking_system.payment.config.PayPalConfig;
 import com.example.modular_booking_system.payment.dto.paypal.PayPalCreateOrderRequest;
 import com.example.modular_booking_system.payment.dto.paypal.PayPalOrderResponse;
 import com.example.modular_booking_system.payment.dto.paypal.PurchaseUnit;
 import com.example.modular_booking_system.payment.exception.PaymentException;
 import com.example.modular_booking_system.payment.model.PaymentDetails;
-import com.example.modular_booking_system.payment.service.AuditEventPublisher;
+import com.example.modular_booking_system.payment.service.PaymentAuditEventPublisher;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
@@ -21,7 +21,6 @@ import java.math.RoundingMode;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.Collections;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -33,7 +32,7 @@ public class PayPalCreatePaymentService {
     private final PayPalAccessTokenService accessTokenService;
     private final PayPalConfig.PayPalProperties payPalProperties;
 
-    private final AuditEventPublisher auditEventPublisher;
+    private final PaymentAuditEventPublisher paymentAuditEventPublisher;
 
 
     public PaymentDetails createPayment(
@@ -64,13 +63,16 @@ public class PayPalCreatePaymentService {
                 PaymentDetails paymentDetails = buildPaymentDetails(orderResponse, totalAmount, currency, intent, cancelUrl, successUrl);
 
                 // Publish audit event
-                auditEventPublisher.publishPaymentCreated("PAYMENT_CREATED",
+                paymentAuditEventPublisher.publishPaymentCreated(
+                        "PAYMENT_CREATED",
                         paymentDetails.getId(),
-                        paymentDetails.getPayer() != null ? paymentDetails.getPayer().getPayerId() : "PENDING",
-                        Optional.of(paymentDetails.getPayer()).map(PaymentDetails.Payer::getPayerName).orElse("Unknown"),
-                        paymentDetails.getAmount().getTotal(),
-                        LocalDateTime.now());
+                        "PAYMENT_SERVICE",
+                        RabbitMQConfig.PAYMENT_AUDIT_QUEUE,
+                        paymentDetails,
+                        "SYSTEM",
+                        LocalDateTime.now()
 
+                );
                 return paymentDetails;
 
             }
