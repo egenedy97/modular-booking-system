@@ -1,14 +1,12 @@
 package com.example.modular_booking_system.auditing.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
+import com.example.modular_booking_system.auditing.converter.JsonNodeConverter;
+import com.fasterxml.jackson.databind.JsonNode;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import jakarta.persistence.Id;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -21,10 +19,15 @@ public class AuditLog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private String messageId;
     private String action;
-    private String referenceId;
-    private String userId;
-    private String username;
-    private BigDecimal amount;
-    private LocalDateTime timestamp;
+    private String serviceName;
+    private String topicName;
+
+    @Convert(converter = JsonNodeConverter.class)
+    @Column(columnDefinition = "TEXT")
+    private JsonNode data;
+
+    private String auditBy;
+    private LocalDateTime auditDate;
 }
