@@ -1,28 +1,44 @@
 version: "3.8"
 services:
   postgres:
-    image: postgres:16
+    image: postgres:16.9-alpine3.22
     container_name: postgres
+    restart: unless-stopped
     environment:
-      POSTGRES_DB: bookingdb
-      POSTGRES_USER: bookinguser
-      POSTGRES_PASSWORD: bookingpass
+      POSTGRES_PASSWORD: mysecretpassword
+      PGDATA: /var/lib/postgresql/data/pgdata
     ports:
       - "5432:5432"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - ./custom/mount:/var/lib/postgresql/data
 
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    restart: unless-stopped
+    environment:
+      PGADMIN_DEFAULT_EMAIL: root@example.com
+      PGADMIN_DEFAULT_PASSWORD: passwd
+    ports:
+      - "5050:80"
+    volumes:
+      - ./logs/pgadmin:/var/log/pgadmin
+    depends_on:
+      - postgres
   redis:
-    image: redis:7
+    image: redis:7-alpine
     container_name: redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
     ports:
       - "6379:6379"
     volumes:
       - redis_data:/data
 
   rabbitmq:
-    image: rabbitmq:3-management
+    image: rabbitmq:3-management-alpine
     container_name: rabbitmq
+    restart: unless-stopped
     environment:
       RABBITMQ_DEFAULT_USER: guest
       RABBITMQ_DEFAULT_PASS: guest
@@ -32,29 +48,76 @@ services:
     volumes:
       - rabbitmq_data:/var/lib/rabbitmq
 
-  kong:
-    image: kong
-    volumes:
-      - "./config:/usr/local/kong/declarative"
-      - "./logs/file.log:/file.log"
-    environment:
-      - KONG_DATABASE=off
-      - KONG_DECLARATIVE_CONFIG=/usr/local/kong/declarative/kong.yml
-      - KONG_PROXY_ACCESS_LOG=/dev/stdout
-      - KONG_ADMIN_ACCESS_LOG=/dev/stdout
-      - KONG_PROXY_ERROR_LOG=/dev/stderr
-      - KONG_ADMIN_ERROR_LOG=/dev/stderr
-      - KONG_ADMIN_LISTEN=0.0.0.0:8001, 0.0.0.0:8444 ssl
-      - KONG_LOG_LEVEL=debug
-      - KONG_PLUGINS=bundled
-    ports:
-      - "6666:8000/tcp" # kong proxy port
-      - "127.0.0.1:7990:8001/tcp"
-      - "8001:8001/tcp"
-      - "8443:8443/tcp"
-      - "127.0.0.1:8444:8444/tcp"
+      # kong:
+      #   image: kong:3.5-alpine
+      #   container_name: kong
+      #   restart: unless-stopped
+      #   volumes:
+      #     - "./config:/usr/local/kong/declarative:ro"
+      #     - "./logs/file.log:/file.log:ro"
+      #     - kong_logs:/usr/local/kong/logs
+      #   environment:
+      #     - KONG_DATABASE=off
+      #     - KONG_DECLARATIVE_CONFIG=/usr/local/kong/declarative/kong.yml
+      #     - KONG_PROXY_ACCESS_LOG=/dev/stdout
+      #     - KONG_ADMIN_ACCESS_LOG=/dev/stdout
+      #     - KONG_PROXY_ERROR_LOG=/dev/stderr
+      #     - KONG_ADMIN_ERROR_LOG=/dev/stderr
+      #     - KONG_ADMIN_LISTEN=0.0.0.0:8001, 0.0.0.0:8444 ssl
+      #     - KONG_LOG_LEVEL=info
+      #     - KONG_PLUGINS=bundled
+      #     - KONG_NGINX_WORKER_PROCESSES=auto
+      #     - KONG_NGINX_WORKER_CONNECTIONS=auto
+      #   ports:
+      #     - "127.0.0.1:6666:8000/tcp" # kong proxy port
+      #     - "127.0.0.1:7990:8001/tcp"
+      #     - "127.0.0.1:8001:8001/tcp"
+      #     - "127.0.0.1:8443:8443/tcp"
+      #     - "127.0.0.1:8444:8444/tcp"
+      #   healthcheck:
+      #     test: ["CMD", "kong", "health"]
+      #     interval: 30s
+      #     timeout: 10s
+      # retries: 3
+    #     start_period: 40s
+  #   deploy:
+  #     resources:
+  #       limits:
+  #         memory: 256M
+  #         cpus: "0.25"
+  #       reservations:
+  #         memory: 128M
+  #         cpus: "0.1"
+
+#  app:
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+#    container_name: booking-app
+#    restart: unless-stopped
+#    env_file:
+#      - .env
+#    environment:
+#      # Map host environment variables to container
+#      - SPRING_APPLICATION_NAME=${SPRING_APPLICATION_NAME:-booking-app}
+#      - AMADEUS_API_KEY=${AMADEUS_API_KEY}
+#      - AMADEUS_API_SECRET=${AMADEUS_API_SECRET}
+#      - SERVER_PORT=${SERVER_PORT:-8090}
+#      - SPRING_PROFILES_ACTIVE=${SPRING_PROFILES_ACTIVE:-dev}
+#      - SPRING_DATASOURCE_URL=${SPRING_DATASOURCE_URL:-jdbc:postgresql://postgres:5432/bookingdb}
+#      - SPRING_DATASOURCE_USERNAME=${SPRING_DATASOURCE_USERNAME:-bookinguser}
+#      - SPRING_DATASOURCE_PASSWORD=${SPRING_DATASOURCE_PASSWORD:-bookingpass}
+#      - SPRING_REDIS_HOST=${SPRING_REDIS_HOST:-redis}
+#      - SPRING_REDIS_PORT=${SPRING_REDIS_PORT:-6379}
+#      - SPRING_RABBITMQ_HOST=${SPRING_RABBITMQ_HOST:-rabbitmq}
+#      - SPRING_RABBITMQ_PORT=${SPRING_RABBITMQ_PORT:-5672}
+#      - SPRING_RABBITMQ_USERNAME=${SPRING_RABBITMQ_USERNAME:-guest}
+#      - SPRING_RABBITMQ_PASSWORD=${SPRING_RABBITMQ_PASSWORD:-guest}
+#    ports:
+#      - "127.0.0.1:${APP_PORT:-8090}:8090"
 
 volumes:
   postgres_data:
+  pgadmin_data:
   redis_data:
   rabbitmq_data:
