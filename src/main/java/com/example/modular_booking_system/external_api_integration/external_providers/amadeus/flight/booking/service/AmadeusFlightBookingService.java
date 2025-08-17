@@ -29,15 +29,15 @@ public class AmadeusFlightBookingService {
 
     public JsonNode createBooking(JsonNode bookingRequestData) {
         String accessToken = accessTokenService.getAccessToken();
-        JsonNode wrappedRequest = wrapWithData(bookingRequestData);
-        System.out.println("Wrapped request: " + wrappedRequest.toPrettyString());
+//        JsonNode wrappedRequest = wrapWithData(bookingRequestData);
+//        System.out.println("Wrapped request: " + wrappedRequest.toPrettyString());
 
         try {
             return webClient.post()
                     .uri(flightBookingUrl)
                     .header("Authorization", "Bearer " + accessToken)
                     .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(wrappedRequest)
+                    .bodyValue(bookingRequestData)
                     .retrieve()
                     .bodyToMono(JsonNode.class)
                     .block();

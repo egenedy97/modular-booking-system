@@ -1,6 +1,7 @@
 package com.example.modular_booking_system.flight_booking.service;
 
 import com.example.modular_booking_system.flight_booking.dto.BookingContext;
+import com.example.modular_booking_system.flight_booking.service.handler.FlightBookingHandler;
 import com.example.modular_booking_system.flight_booking.service.handler.PaymentCreationHandler;
 import com.example.modular_booking_system.flight_booking.service.handler.PriceConfirmationHandler;
 import lombok.RequiredArgsConstructor;
@@ -12,8 +13,9 @@ public class BookingService {
 
     private final PriceConfirmationHandler priceConfirmationHandler;
     private final PaymentCreationHandler paymentCreationHandler;
+    private final FlightBookingHandler flightBookingHandler;
+
 //    private final PaymentExecutionHandler paymentExecutionHandler;
-//    private final FlightBookingHandler flightBookingHandler;
 
     public BookingContext initiateBooking(BookingContext context) {
 
@@ -24,9 +26,9 @@ public class BookingService {
     }
 
 
-//    public BookingContext completeBooking(BookingContext context) {
-//        // Second chain: Payment execution and flight booking
-//        return paymentExecutionHandler.handle(context);
-//    }
+    public BookingContext completeBooking(BookingContext context) {
+        // Second chain: Payment execution and flight booking
+        return flightBookingHandler.handle(context);
+    }
 }
 

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 public class BookingController {
     private final BookingService bookingService;
 
+    // localhost:8090/api/booking/initiate
     @PostMapping("/initiate")
     public ResponseEntity<BookingContext> initiateBooking(@RequestBody BookingContext context, HttpServletRequest request) {
 
@@ -26,13 +27,15 @@ public class BookingController {
         var result = bookingService.initiateBooking(context);
         return ResponseEntity.ok(result);
     }
-//
-//    @PostMapping("/complete")
-//    public ResponseEntity<BookingContext> completeBooking(@RequestBody BookingContext context) {
-////        var context = bookingService.getBookingContext(bookingId);
-//        var result = bookingService.completeBooking(context);
-//        return ResponseEntity.ok(result);
-//    }
+
+    // localhost:8090/api/booking/complete
+    @PostMapping("/complete")
+    public ResponseEntity<BookingContext> completeBooking(@RequestBody BookingContext context) {
+//        var context = bookingService.getBookingContext(bookingId);
+        var result = bookingService.completeBooking(context);
+        return ResponseEntity.ok(result);
+    }
+
 
     private String getBaseUrl(HttpServletRequest request) {
         String scheme = request.getScheme();
