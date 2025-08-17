@@ -13,8 +13,9 @@ public class BookingContext {
 
     private String bookingId;
     private String userId;
-//    private FlightBookingRequest flightBookingRequest;
-//    private JsonNode flightBookingResponse;
+
+    private JsonNode flightBookingRequest;
+    private JsonNode flightBookingResponse;
 
     private JsonNode flightOffer;
     private JsonNode FlightOfferPriceConfirmationResponse;
