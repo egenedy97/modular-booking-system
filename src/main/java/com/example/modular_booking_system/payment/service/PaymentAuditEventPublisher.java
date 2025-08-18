@@ -24,20 +24,20 @@ public class PaymentAuditEventPublisher {
     }
 
     // Publishes an audit event for when a payment is created
-    public void publishPaymentCreated(String action, String messageId, String serviceName, String topicName, Object data, String auditBy, LocalDateTime auditDate) {
-        AuditEvent event = new AuditEvent(action, messageId, serviceName, topicName, data, auditBy, auditDate);
+    public void publishPaymentCreated(String messageId, String action, String serviceName, String topicName, Object data, String auditBy, LocalDateTime auditDate) {
+        AuditEvent event = new AuditEvent(messageId, action, serviceName, topicName, data, auditBy, auditDate);
         publishPaymentEvent(event);
     }
 
     // Publishes an audit event for when a payment is retrieved
-    public void publishPaymentRetrieved(String action, String messageId, String serviceName, String topicName, Object data, String auditBy, LocalDateTime auditDate) {
-        AuditEvent event = new AuditEvent(action, messageId, serviceName, topicName, data, auditBy, auditDate);
+    public void publishPaymentRetrieved(String messageId, String action, String serviceName, String topicName, Object data, String auditBy, LocalDateTime auditDate) {
+        AuditEvent event = new AuditEvent(messageId, action, serviceName, topicName, data, auditBy, auditDate);
         publishPaymentEvent(event);
     }
 
     // Publishes an audit event for when a payment is executed
-    public void publishPaymentExecuted(String action, String messageId, String serviceName, String topicName, Object data, String auditBy, LocalDateTime auditDate) {
-        AuditEvent event = new AuditEvent(action, messageId, serviceName, topicName, data, auditBy, auditDate);
+    public void publishPaymentExecuted(String messageId, String action, String serviceName, String topicName, Object data, String auditBy, LocalDateTime auditDate) {
+        AuditEvent event = new AuditEvent(messageId, action, serviceName, topicName, data, auditBy, auditDate);
         publishPaymentEvent(event);
     }
 
