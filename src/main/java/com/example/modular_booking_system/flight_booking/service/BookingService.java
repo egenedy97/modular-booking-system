@@ -3,7 +3,7 @@ package com.example.modular_booking_system.flight_booking.service;
 import com.example.modular_booking_system.flight_booking.dto.BookingContext;
 import com.example.modular_booking_system.flight_booking.service.handler.FlightBookingHandler;
 import com.example.modular_booking_system.flight_booking.service.handler.PaymentCreationHandler;
-import com.example.modular_booking_system.flight_booking.service.handler.PriceConfirmationHandler;
+import com.example.modular_booking_system.flight_booking.service.handler.FlightPriceConfirmationHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class BookingService {
 
-    private final PriceConfirmationHandler priceConfirmationHandler;
+    private final FlightPriceConfirmationHandler flightPriceConfirmationHandler;
     private final PaymentCreationHandler paymentCreationHandler;
     private final FlightBookingHandler flightBookingHandler;
 
@@ -20,14 +20,15 @@ public class BookingService {
     public BookingContext initiateBooking(BookingContext context) {
 
         // First chain: Price confirmation and payment creation
-        priceConfirmationHandler.setNext(paymentCreationHandler);
+        flightPriceConfirmationHandler.setNext(paymentCreationHandler);
 
-        return priceConfirmationHandler.handle(context);
+        return flightPriceConfirmationHandler.handle(context);
     }
 
 
     public BookingContext completeBooking(BookingContext context) {
-        // Second chain: Payment execution and flight booking
+
+        // Second chain: flight booking
         return flightBookingHandler.handle(context);
     }
 }

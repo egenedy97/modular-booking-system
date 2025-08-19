@@ -62,10 +62,11 @@ public class PayPalCreatePaymentService {
             if (orderResponse != null && orderResponse.getId() != null) {
                 PaymentDetails paymentDetails = buildPaymentDetails(orderResponse, totalAmount, currency, intent, cancelUrl, successUrl);
 
+                // String action, String messageId, String serviceName, String topicName, Object data, String auditBy, LocalDateTime auditDate
                 // Publish audit event
                 paymentAuditEventPublisher.publishPaymentCreated(
-                        "PAYMENT_CREATED",
                         paymentDetails.getId(),
+                        "PAYMENT_CREATED",
                         "PAYMENT_SERVICE",
                         RabbitMQConfig.PAYMENT_AUDIT_QUEUE,
                         paymentDetails,

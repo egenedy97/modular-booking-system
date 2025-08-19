@@ -37,8 +37,8 @@ public class PayPalExecutePaymentService {
 
             // Add audit event
             paymentAuditEventPublisher.publishPaymentExecuted(
-                    "PAYMENT_COMPLETED",
                     paymentDetails.getId(),
+                    "PAYMENT_COMPLETED",
                     "PAYMENT_SERVICE",
                     RabbitMQConfig.PAYMENT_AUDIT_QUEUE,
                     paymentDetails,
