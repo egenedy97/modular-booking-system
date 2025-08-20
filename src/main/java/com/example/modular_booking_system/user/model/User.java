@@ -62,7 +62,8 @@ public class User implements Serializable {
     @JoinColumn(name = "documentId")
     private List<Document> documents = new ArrayList<>();
 
-    @OneToOne(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "notification_settings_id", referencedColumnName = "notificationSettingsId")
     private NotificationSettings notificationSettings;
 
     @OneToOne(cascade = CascadeType.ALL)

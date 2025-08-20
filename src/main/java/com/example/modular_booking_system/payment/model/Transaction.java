@@ -48,11 +48,11 @@ public class Transaction implements Serializable {
 
     @ManyToOne
     @JoinColumn(name = "payment_method_id", nullable = false)
-    private Long paymentMethod;
+    private PaymentMethod paymentMethod;
 
     @ManyToOne
     @JoinColumn(name = "transaction_status_id", nullable = false)
-    private Long transactionStatus;
+    private TransactionStatus transactionStatus;
 
     @Column(name = "cancelUrl", nullable = true)
     private String cancelUrl;
