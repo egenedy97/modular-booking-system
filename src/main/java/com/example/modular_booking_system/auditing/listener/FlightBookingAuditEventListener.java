@@ -9,14 +9,14 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class PaymentAuditEventListener {
+public class FlightBookingAuditEventListener {
 
     private final AuditService auditService;
 
-    // Method that listens for messages from the PAYMENT_AUDIT_QUEUE.
-    // When a AuditEvent is received, it creates and saves an AuditLog entity.
-    @RabbitListener(queues = RabbitMQConfig.PAYMENT_AUDIT_QUEUE)
-    public void handlePaymentAuditEvent(AuditEvent event) {
+    // Method that listens for messages from the FLIGHT_BOOKING_AUDIT_QUEUE .
+    // When an AuditEvent is received, it creates and saves an AuditLog entity.
+    @RabbitListener(queues = RabbitMQConfig.FLIGHT_BOOKING_AUDIT_QUEUE)
+    public void handleFlightBookingAuditEvent(AuditEvent event) {
         auditService.saveAuditLog(event);
     }
 }

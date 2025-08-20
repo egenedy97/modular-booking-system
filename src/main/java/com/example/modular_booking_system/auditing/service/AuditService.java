@@ -22,8 +22,8 @@ public class AuditService {
         JsonNode jsonData = objectMapper.valueToTree(event.getData());
 
         AuditLog auditLog = new AuditLog();
-        auditLog.setAction(event.getAction());
         auditLog.setMessageId(event.getMessageId());
+        auditLog.setAction(event.getAction());
         auditLog.setServiceName(event.getServiceName());
         auditLog.setTopicName(event.getTopicName());
         auditLog.setAuditBy(event.getAuditBy());
