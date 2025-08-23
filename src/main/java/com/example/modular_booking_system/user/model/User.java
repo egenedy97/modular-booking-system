@@ -5,6 +5,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.modular_booking_system.flight_booking.model.FlightBooking;
 import com.example.modular_booking_system.notification.model.NotificationSettings;
 
 import jakarta.persistence.CascadeType;
@@ -33,33 +34,42 @@ public class User implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "userId")
+    @Column(name = "user_id")
     private Long id;
 
     @Column(name = "username", nullable = false, unique = true)
     private String username;
 
-    @Column(name = "passwordHash", nullable = false, length = 64)
-    private String passwordHash;
+    @Column(name = "email", nullable = false, unique = true)
+    private String email;
+
+    @Column(name = "first_name", nullable = false)
+    private String firstName;
+
+    @Column(name = "last_name", nullable = false)
+    private String lastName;
+
+    @Column(name = "password", nullable = false, length = 64)
+    private String password;
 
     @Column(name = "gender", length = 11)
     private Gender gender;
 
-    @Column(name = "dateOfBirth")
+    @Column(name = "date_of_birth")
     private LocalDateTime dateOfBirth;
 
-    @Column(name = "registrationDate", nullable = false)
+    @Column(name = "registration_date")
     private LocalDateTime registrationDate;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "status_id")
     private UserStatus status;
 
-    @Column(name = "lastLogin")
+    @Column(name = "last_login")
     private LocalDateTime lastLogin;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "documentId")
+    @JoinColumn(name = "document_id")
     private List<Document> documents = new ArrayList<>();
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
@@ -69,4 +79,7 @@ public class User implements Serializable {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "contact_id", referencedColumnName = "id")
     private Contact contact;
+
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<FlightBooking> bookings;
 }
