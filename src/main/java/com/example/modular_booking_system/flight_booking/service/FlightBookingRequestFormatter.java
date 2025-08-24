@@ -20,15 +20,6 @@ public class FlightBookingRequestFormatter {
 
     private final ObjectMapper objectMapper;
 
-    /**
-     * Formats a flight offer and user information into an Amadeus-compatible booking request
-     *
-     * @param flightOffer The flight offer to book
-//     * @param userId      The ID of the user making the booking
-     * @return JSON string formatted for Amadeus booking
-     */
-
-//    public String formatFlightBookingRequest(Object flightOffer, Long userId, User user)
     public JsonNode formatFlightBookingRequest(Object flightOffer, User user) {
         try {
             // Convert the flight offer to our DTO structure
