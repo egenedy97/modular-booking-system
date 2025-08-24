@@ -1,7 +1,6 @@
 package com.example.modular_booking_system.external_api_integration.external_providers.amadeus.flight.booking.service;
 
 import com.example.modular_booking_system.external_api_integration.external_providers.amadeus.shared.AccessTokenService;
-import com.example.modular_booking_system.flight_booking.repository.FlightBookingRepository;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -18,9 +17,6 @@ public class AmadeusFlightBookingService {
     private final WebClient webClient;
     private final AccessTokenService accessTokenService;
     private final ObjectMapper mapper;
-
-    private final FlightBookingRepository flightBookingRepository;
-//    private final UserService userService;
 
     @Value("${amadeus.api.flight-booking-url}")
     private String flightBookingUrl;
