@@ -3,7 +3,10 @@ package com.example.modular_booking_system.flight_booking.service.handler;
 import com.example.modular_booking_system.core.config.RabbitMQConfig;
 import com.example.modular_booking_system.external_api_integration.external_providers.amadeus.flight.booking.service.AmadeusFlightBookingService;
 import com.example.modular_booking_system.flight_booking.dto.BookingContext;
+import com.example.modular_booking_system.flight_booking.service.FlightBookingRequestFormatter;
 import com.example.modular_booking_system.flight_booking.service.FlightBookingAuditEventPublisher;
+import com.example.modular_booking_system.user.model.User;
+import com.example.modular_booking_system.user.service.UserService;
 import com.fasterxml.jackson.databind.JsonNode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
@@ -16,10 +19,19 @@ public class FlightBookingHandler extends BookingHandler {
 
     private final AmadeusFlightBookingService amadeusFlightBookingService;
     private final FlightBookingAuditEventPublisher flightBookingAuditEventPublisher;
+    private final FlightBookingRequestFormatter flightBookingRequestFormatter;
+    private final UserService userService;
 
     @Override
     public BookingContext handle(BookingContext context) {
         try {
+
+            User user = userService.findById(Long.parseLong(context.getUserId()));
+
+            JsonNode FlightBookingRequest = flightBookingRequestFormatter.formatFlightBookingRequest(context.getFlightOffer(), user);
+
+            context.setFlightBookingRequest(FlightBookingRequest);
+
             JsonNode bookingResponse = amadeusFlightBookingService.createBooking(context.getFlightBookingRequest());
             context.setFlightBookingResponse(bookingResponse);
             context.setStatus("FLIGHT_BOOKED");

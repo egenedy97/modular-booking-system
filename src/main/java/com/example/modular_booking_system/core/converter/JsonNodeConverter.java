@@ -1,4 +1,4 @@
-package com.example.modular_booking_system.auditing.converter;
+package com.example.modular_booking_system.core.converter;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
