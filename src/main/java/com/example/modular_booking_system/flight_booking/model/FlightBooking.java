@@ -1,22 +1,24 @@
 package com.example.modular_booking_system.flight_booking.model;
 
+import com.example.modular_booking_system.core.converter.JsonNodeConverter;
 import com.example.modular_booking_system.user.model.User;
+import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Table(name = "flight_booking")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class FlightBooking {
+public class FlightBooking implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -52,12 +54,21 @@ public class FlightBooking {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 
-    // Relationships
-    @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<BookingTraveler> travelers;
+//    // Relationships
+//    @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<BookingTraveler> travelers;
+//
+//    @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<BookingSegment> segments;
 
-    @OneToMany(mappedBy = "booking", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<BookingSegment> segments;
+
+    @Convert(converter = JsonNodeConverter.class)
+    @Column(columnDefinition = "jsonb") // if PostgreSQL
+    private JsonNode travelers;
+
+    @Convert(converter = JsonNodeConverter.class)
+    @Column(columnDefinition = "jsonb") // if PostgreSQL
+    private JsonNode segments;
 
     @PrePersist
     public void onCreate() {
