@@ -21,13 +21,13 @@ public class NotificationSettings implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "notificationSettingsId")
+    @Column(name = "notification_settings_id")
     private Long id;
 
-    @Column(name = "emailNotificationsEnabled", nullable = false)
+    @Column(name = "email_notifications_enabled", nullable = false)
     private boolean emailNotificationsEnabled;
 
-    @Column(name = "smsNotificationsEnabled", nullable = false)
+    @Column(name = "sms_notifications_enabled", nullable = false)
     private boolean smsNotificationsEnabled;
 
 }

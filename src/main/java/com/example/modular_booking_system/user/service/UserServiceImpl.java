@@ -6,33 +6,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.Optional;
-
 @Service
 @RequiredArgsConstructor
-public class UserServiceImpl implements UserService{
-
+public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
-
-    @Override
-    @Transactional(readOnly = true)
-    public List<User> findAll() {
-        return userRepository.findAll();
-    }
 
     @Override
     public User findById(Long id) {
         return userRepository.findUserById(id);
     }
-
-    @Override
-    @Transactional(readOnly = true)
-    public Optional<User> findByEmail(String email) {
-        return userRepository.findByEmail(email);
-    }
-
 
     @Override
     @Transactional(readOnly = true)
@@ -46,9 +29,4 @@ public class UserServiceImpl implements UserService{
         return userRepository.save(user);
     }
 
-    @Override
-    @Transactional
-    public void deleteById(Long id) {
-        userRepository.deleteById(id);
-    }
 }

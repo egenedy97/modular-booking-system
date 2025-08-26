@@ -73,12 +73,11 @@ public class User implements Serializable {
     private List<Document> documents = new ArrayList<>();
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "notification_settings_id", referencedColumnName = "notificationSettingsId")
+    @JoinColumn(name = "notification_settings_id", referencedColumnName = "notification_settings_id")
     private NotificationSettings notificationSettings;
 
-    @OneToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "contact_id", referencedColumnName = "id")
-    private Contact contact;
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Contact> contacts = new ArrayList<>();
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<FlightBooking> bookings;
