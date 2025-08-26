@@ -26,8 +26,9 @@ import lombok.NoArgsConstructor;
 public class Contact implements Serializable {
 
     @Id
+    @Column(name = "contact_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long contactId;
 
     @Column(name = "email", nullable = false, unique = true)
     private String email;

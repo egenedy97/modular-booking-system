@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.time.LocalDateTime;
 
 import com.example.modular_booking_system.user.model.Contact;
-
+import com.example.modular_booking_system.user.model.User;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -35,9 +35,6 @@ public class Booking implements Serializable {
     @Column(name = "bookingNumber", nullable = false, unique = true)
     private String bookingNumber;
 
-    @Column(name = "userId", nullable = false)
-    private Long userId;
-
     @Column(name = "ExternalBookingId", nullable = false)
     private Long externalBookingId;
 
@@ -45,7 +42,7 @@ public class Booking implements Serializable {
     private BookingStatus bookingStatus;
 
     @ManyToOne(cascade = CascadeType.ALL)
-    @JoinColumn(name = "contact_id", referencedColumnName = "id")
+    @JoinColumn(name = "contact_id", referencedColumnName = "contact_id")
     private Contact contact;
 
     @Column(name = "more_details", nullable = true)
@@ -77,5 +74,9 @@ public class Booking implements Serializable {
 
     @Column(name = "departure_date", nullable = false)
     private LocalDateTime departureDate;
+
+    @ManyToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id", insertable = false, updatable = false)
+    private User user;
 
 }

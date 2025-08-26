@@ -37,7 +37,7 @@ public class Notification implements Serializable {
     private LocalDateTime updatedAt;
 
     @ManyToOne
-    @JoinColumn(name = "Receiver", nullable = false)
+    @JoinColumn(name = "Receiver", nullable = false, referencedColumnName = "user_id")
     private User user;
 
 }
