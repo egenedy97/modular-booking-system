@@ -1,6 +1,6 @@
 package com.example.modular_booking_system.auditing.model;
 
-import com.example.modular_booking_system.auditing.converter.JsonNodeConverter;
+import com.example.modular_booking_system.core.converter.JsonNodeConverter;
 import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
