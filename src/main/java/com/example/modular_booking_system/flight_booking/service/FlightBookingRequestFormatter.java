@@ -68,8 +68,8 @@ public class FlightBookingRequestFormatter {
 
         // Set name
         AmadeusFlightOrderRequest.Name name = new AmadeusFlightOrderRequest.Name();
-        name.setFirstName(user.getFirstName() != null ? user.getFirstName().toUpperCase() : "");
-        name.setLastName(user.getLastName() != null ? user.getLastName().toUpperCase() : "");
+        name.setFirstName(user.getContact().getFirstName() != null ? user.getContact().getFirstName().toUpperCase() : "");
+        name.setLastName(user.getContact().getLastName() != null ? user.getContact().getLastName().toUpperCase() : "");
         traveler.setName(name);
 
         // Set gender (assuming User model has a gender field)
@@ -79,7 +79,7 @@ public class FlightBookingRequestFormatter {
 
         // Set contact information (simplified - in a real app, this would come from user profile)
         AmadeusFlightOrderRequest.TravelerContact contact = new AmadeusFlightOrderRequest.TravelerContact();
-        contact.setEmailAddress(user.getEmail() != null ? user.getEmail() : "");
+        contact.setEmailAddress(user.getContact().getEmail() != null ? user.getContact().getEmail() : "");
 
         AmadeusFlightOrderRequest.Phone phone = new AmadeusFlightOrderRequest.Phone();
         phone.setDeviceType("MOBILE");

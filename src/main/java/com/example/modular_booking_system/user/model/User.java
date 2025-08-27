@@ -53,7 +53,7 @@ public class User implements Serializable {
     private List<Document> documents = new ArrayList<>();
 
     @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "notification_settings_id", referencedColumnName = "notificationSettingsId")
+    @JoinColumn(name = "notification_settings_id", referencedColumnName = "notification_settings_id")
     private NotificationSettings notificationSettings;
 
     @OneToOne(cascade = CascadeType.ALL)

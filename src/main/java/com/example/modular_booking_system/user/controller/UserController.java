@@ -19,7 +19,7 @@
 
         @PostMapping("/users")
         public ResponseEntity<User> createUser(@RequestBody User user) {
-            if (userService.existsByEmail(user.getEmail())) {
+            if (userService.existsByEmail(user.getContact().getEmail())) {
                 return ResponseEntity.badRequest().build();
             }
             return ResponseEntity.ok(userService.save(user));
