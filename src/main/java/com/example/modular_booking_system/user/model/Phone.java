@@ -33,5 +33,4 @@ public class Phone implements Serializable {
     @JoinColumn(name = "contact_id", nullable = false)
     private Contact contact;
 
-
 }
