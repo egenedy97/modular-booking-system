@@ -1,0 +1,316 @@
+{
+    "data": {
+        "type": "flight-order",
+        "id": "eJzTd9e3MPV0sXQGAAovAhw%3D",
+        "queuingOfficeId": "NCE4D31SB",
+        "associatedRecords": [
+            {
+                "reference": "85ID9C",
+                "creationDate": "2025-08-23T21:31:00.000",
+                "originSystemCode": "GDS",
+                "flightOfferId": "1"
+            },
+            {
+                "reference": "85ID9C",
+                "creationDate": "2025-08-23T21:31:00.000",
+                "originSystemCode": "6X",
+                "flightOfferId": "1"
+            }
+        ],
+        "flightOffers": [
+            {
+                "type": "flight-offer",
+                "id": "1",
+                "source": "GDS",
+                "nonHomogeneous": false,
+                "lastTicketingDate": "2025-09-07",
+                "itineraries": [
+                    {
+                        "segments": [
+                            {
+                                "departure": {
+                                    "iataCode": "CDG",
+                                    "at": "2025-09-07T15:25:00"
+                                },
+                                "arrival": {
+                                    "iataCode": "HEL",
+                                    "at": "2025-09-07T19:20:00"
+                                },
+                                "carrierCode": "6X",
+                                "number": "3618",
+                                "aircraft": {
+                                    "code": "733"
+                                },
+                                "duration": "PT2H55M",
+                                "id": "3",
+                                "numberOfStops": 0,
+                                "co2Emissions": [
+                                    {
+                                        "weight": 175,
+                                        "weightUnit": "KG",
+                                        "cabin": "ECONOMY"
+                                    }
+                                ]
+                            },
+                            {
+                                "departure": {
+                                    "iataCode": "HEL",
+                                    "at": "2025-09-08T17:30:00"
+                                },
+                                "arrival": {
+                                    "iataCode": "ICN",
+                                    "at": "2025-09-09T08:20:00"
+                                },
+                                "carrierCode": "6X",
+                                "number": "3605",
+                                "aircraft": {
+                                    "code": "733"
+                                },
+                                "duration": "PT8H50M",
+                                "id": "4",
+                                "numberOfStops": 0,
+                                "co2Emissions": [
+                                    {
+                                        "weight": 295,
+                                        "weightUnit": "KG",
+                                        "cabin": "ECONOMY"
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        "segments": [
+                            {
+                                "departure": {
+                                    "iataCode": "ICN",
+                                    "at": "2025-09-21T09:53:00"
+                                },
+                                "arrival": {
+                                    "iataCode": "CDG",
+                                    "at": "2025-09-21T14:10:00"
+                                },
+                                "carrierCode": "6X",
+                                "number": "957",
+                                "aircraft": {
+                                    "code": "332"
+                                },
+                                "duration": "PT11H17M",
+                                "id": "7",
+                                "numberOfStops": 0,
+                                "co2Emissions": [
+                                    {
+                                        "weight": 382,
+                                        "weightUnit": "KG",
+                                        "cabin": "ECONOMY"
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                ],
+                "price": {
+                    "currency": "EUR",
+                    "total": "222.82",
+                    "base": "125.00",
+                    "fees": [
+                        {
+                            "amount": "0.00",
+                            "type": "TICKETING"
+                        },
+                        {
+                            "amount": "0.00",
+                            "type": "SUPPLIER"
+                        },
+                        {
+                            "amount": "0.00",
+                            "type": "FORM_OF_PAYMENT"
+                        }
+                    ],
+                    "grandTotal": "222.82",
+                    "billingCurrency": "EUR"
+                },
+                "pricingOptions": {
+                    "fareType": [
+                        "PUBLISHED"
+                    ],
+                    "includedCheckedBagsOnly": true
+                },
+                "validatingAirlineCodes": [
+                    "6X"
+                ],
+                "travelerPricings": [
+                    {
+                        "travelerId": "1",
+                        "fareOption": "STANDARD",
+                        "travelerType": "ADULT",
+                        "price": {
+                            "currency": "EUR",
+                            "total": "222.82",
+                            "base": "125.00",
+                            "taxes": [
+                                {
+                                    "amount": "14.84",
+                                    "code": "BP"
+                                },
+                                {
+                                    "amount": "22.30",
+                                    "code": "FR"
+                                },
+                                {
+                                    "amount": "40.00",
+                                    "code": "O4"
+                                },
+                                {
+                                    "amount": "13.95",
+                                    "code": "QX"
+                                },
+                                {
+                                    "amount": "5.83",
+                                    "code": "WL"
+                                },
+                                {
+                                    "amount": "0.90",
+                                    "code": "XU"
+                                }
+                            ],
+                            "refundableTaxes": "97.82"
+                        },
+                        "fareDetailsBySegment": [
+                            {
+                                "segmentId": "3",
+                                "cabin": "ECONOMY",
+                                "fareBasis": "YCNV1",
+                                "class": "Y",
+                                "includedCheckedBags": {
+                                    "quantity": 1
+                                }
+                            },
+                            {
+                                "segmentId": "4",
+                                "cabin": "ECONOMY",
+                                "fareBasis": "YCNV1",
+                                "class": "Y",
+                                "includedCheckedBags": {
+                                    "quantity": 1
+                                }
+                            },
+                            {
+                                "segmentId": "7",
+                                "cabin": "ECONOMY",
+                                "fareBasis": "YCNV1",
+                                "class": "Y",
+                                "includedCheckedBags": {
+                                    "quantity": 1
+                                }
+                            }
+                        ]
+                    }
+                ]
+            }
+        ],
+        "travelers": [
+            {
+                "id": "1",
+                "dateOfBirth": "1982-01-16",
+                "gender": "MALE",
+                "name": {
+                    "firstName": "JORGE",
+                    "lastName": "GONZALES"
+                },
+                "documents": [
+                    {
+                        "number": "00000000",
+                        "issuanceDate": "2015-04-14",
+                        "expiryDate": "2025-11-14",
+                        "issuanceCountry": "ES",
+                        "issuanceLocation": "Madrid",
+                        "nationality": "ES",
+                        "birthPlace": "Madrid",
+                        "documentType": "PASSPORT",
+                        "holder": true
+                    }
+                ],
+                "contact": {
+                    "purpose": "STANDARD",
+                    "phones": [
+                        {
+                            "deviceType": "MOBILE",
+                            "countryCallingCode": "34",
+                            "number": "480080076"
+                        }
+                    ],
+                    "emailAddress": "jorge.gonzales833@telefonica.es"
+                }
+            }
+        ],
+        "remarks": {
+            "general": [
+                {
+                    "subType": "GENERAL_MISCELLANEOUS",
+                    "text": "ONLINE BOOKING FROM INCREIBLE VIAJES"
+                }
+            ]
+        },
+        "ticketingAgreement": {
+            "option": "DELAY_TO_CANCEL",
+            "delay": "6D"
+        },
+        "automatedProcess": [
+            {
+                "code": "IMMEDIATE",
+                "queue": {
+                    "number": "0",
+                    "category": "0"
+                },
+                "officeId": "NCE4D31SB"
+            }
+        ],
+        "contacts": [
+            {
+                "addresseeName": {
+                    "firstName": "PABLO RODRIGUEZ"
+                },
+                "address": {
+                    "lines": [
+                        "Calle Prado, 16"
+                    ],
+                    "postalCode": "28014",
+                    "countryCode": "ES",
+                    "cityName": "Madrid"
+                },
+                "purpose": "STANDARD",
+                "phones": [
+                    {
+                        "deviceType": "LANDLINE",
+                        "countryCallingCode": "34",
+                        "number": "480080071"
+                    },
+                    {
+                        "deviceType": "MOBILE",
+                        "countryCallingCode": "33",
+                        "number": "480080072"
+                    }
+                ],
+                "companyName": "INCREIBLE VIAJES",
+                "emailAddress": "support@increibleviajes.es"
+            }
+        ]
+    },
+    "dictionaries": {
+        "locations": {
+            "ICN": {
+                "cityCode": "SEL",
+                "countryCode": "KR"
+            },
+            "CDG": {
+                "cityCode": "PAR",
+                "countryCode": "FR"
+            },
+            "HEL": {
+                "cityCode": "HEL",
+                "countryCode": "FI"
+            }
+        }
+    }
+}
