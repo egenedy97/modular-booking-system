@@ -11,9 +11,21 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class RabbitMQConfig {
 
-    /* =======================
-       Payment Audit
-    ======================== */
+    // ----------------------- SMS Notification -----------------------
+    public static final String SMS_NOTIFICATION_QUEUE = "sms.notification.queue";
+    public static final String SMS_NOTIFICATION_EXCHANGE = "sms.notification.exchange";
+    public static final String SMS_NOTIFICATION_ROUTING_KEY = "sms.notification.routingkey";
+
+    // ----------------------- Email Notification -----------------------
+    public static final String EMAIL_NOTIFICATION_QUEUE = "email.notification.queue";
+    public static final String EMAIL_NOTIFICATION_EXCHANGE = "email.notification.exchange";
+    public static final String EMAIL_NOTIFICATION_ROUTING_KEY = "email.notification.routingkey";
+
+    /*
+     * =======================
+     * Payment Audit
+     * ========================
+     */
     public static final String PAYMENT_AUDIT_QUEUE = "payment.audit.queue";
     public static final String PAYMENT_AUDIT_EXCHANGE = "payment.audit.exchange";
     public static final String PAYMENT_AUDIT_ROUTING_KEY = "payment.audit.routingkey";
@@ -29,6 +41,26 @@ public class RabbitMQConfig {
     }
 
     @Bean
+    public Queue smsNotificationQueue() {
+        return new Queue(SMS_NOTIFICATION_QUEUE, true);
+    }
+
+    @Bean
+    public TopicExchange smsNotificationExchange() {
+        return new TopicExchange(SMS_NOTIFICATION_EXCHANGE);
+    }
+
+    @Bean
+    public Queue emailNotificationQueue() {
+        return new Queue(EMAIL_NOTIFICATION_QUEUE, true);
+    }
+
+    @Bean
+    public TopicExchange emailNotificationExchange() {
+        return new TopicExchange(EMAIL_NOTIFICATION_EXCHANGE);
+    }
+
+    @Bean
     public Binding paymentAuditBinding(
             @Qualifier("paymentAuditQueue") Queue paymentQueue,
             @Qualifier("paymentAuditExchange") TopicExchange paymentExchange) {
@@ -37,9 +69,11 @@ public class RabbitMQConfig {
                 .with(PAYMENT_AUDIT_ROUTING_KEY);
     }
 
-    /* =======================
-       Flight Booking Audit
-    ======================== */
+    /*
+     * =======================
+     * Flight Booking Audit
+     * ========================
+     */
 
     public static final String FLIGHT_BOOKING_AUDIT_QUEUE = "flight.booking.audit.queue";
     public static final String FLIGHT_BOOKING_AUDIT_EXCHANGE = "flight.booking.audit.exchange";
@@ -64,9 +98,29 @@ public class RabbitMQConfig {
                 .with(FLIGHT_BOOKING_AUDIT_ROUTING_KEY);
     }
 
-    /* =======================
-       Common Beans
-    ======================== */
+    @Bean
+    public Binding smsNotificationBinding(
+            @Qualifier("smsNotificationQueue") Queue smsQueue,
+            @Qualifier("smsNotificationExchange") TopicExchange smsExchange) {
+        return BindingBuilder.bind(smsQueue)
+                .to(smsExchange)
+                .with(SMS_NOTIFICATION_ROUTING_KEY);
+    }
+
+    @Bean
+    public Binding emailNotificationBinding(
+            @Qualifier("emailNotificationQueue") Queue emailQueue,
+            @Qualifier("emailNotificationExchange") TopicExchange emailExchange) {
+        return BindingBuilder.bind(emailQueue)
+                .to(emailExchange)
+                .with(EMAIL_NOTIFICATION_ROUTING_KEY);
+    }
+
+    /*
+     * =======================
+     * Common Beans
+     * ========================
+     */
 
     @Bean
     public Jackson2JsonMessageConverter converter() {
@@ -80,11 +134,11 @@ public class RabbitMQConfig {
         return rabbitTemplate;
     }
 
-//    @Bean
-//    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
-//        RabbitTemplate template = new RabbitTemplate(connectionFactory);
-//        template.setMessageConverter(new Jackson2JsonMessageConverter());
-//        template.setMandatory(true);
-//        return template;
-//    }
+    @Bean
+    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
+        RabbitTemplate template = new RabbitTemplate(connectionFactory);
+        template.setMessageConverter(new Jackson2JsonMessageConverter());
+        template.setMandatory(true);
+        return template;
+    }
 }
