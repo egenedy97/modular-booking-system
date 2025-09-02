@@ -7,6 +7,7 @@ import java.util.List;
 
 import com.example.modular_booking_system.notification.model.NotificationSettings;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 
 import lombok.AllArgsConstructor;
@@ -43,6 +44,7 @@ public class User implements Serializable {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "status_id")
+    @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
     private UserStatus status;
 
     @Column(name = "last_login")
