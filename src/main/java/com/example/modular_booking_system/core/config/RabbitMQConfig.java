@@ -1,6 +1,8 @@
 package com.example.modular_booking_system.core.config;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.annotation.EnableRabbit;
 import org.springframework.amqp.rabbit.connection.ConnectionFactory;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
@@ -8,18 +10,20 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+@RequiredArgsConstructor
 @Configuration
+@EnableRabbit
 public class RabbitMQConfig {
 
     // ----------------------- SMS Notification -----------------------
-    public static final String SMS_NOTIFICATION_QUEUE = "sms.notification.queue";
     public static final String SMS_NOTIFICATION_EXCHANGE = "sms.notification.exchange";
-    public static final String SMS_NOTIFICATION_ROUTING_KEY = "sms.notification.routingkey";
+    public static final String SMS_NOTIFICATION_DELAY_QUEUE = "sms.notification.delay.queue";
+    public static final String SMS_NOTIFICATION_DELAY_ROUTING_KEY = "sms.notification.delay.routingkey";
 
     // ----------------------- Email Notification -----------------------
-    public static final String EMAIL_NOTIFICATION_QUEUE = "email.notification.queue";
     public static final String EMAIL_NOTIFICATION_EXCHANGE = "email.notification.exchange";
-    public static final String EMAIL_NOTIFICATION_ROUTING_KEY = "email.notification.routingkey";
+    public static final String EMAIL_NOTIFICATION_DELAY_QUEUE = "email.notification.delay.queue";
+    public static final String EMAIL_NOTIFICATION_DELAY_ROUTING_KEY = "email.notification.delay.routingkey";
 
     /*
      * =======================
@@ -40,10 +44,7 @@ public class RabbitMQConfig {
         return new TopicExchange(PAYMENT_AUDIT_EXCHANGE);
     }
 
-    @Bean
-    public Queue smsNotificationQueue() {
-        return new Queue(SMS_NOTIFICATION_QUEUE, true);
-    }
+
 
     @Bean
     public TopicExchange smsNotificationExchange() {
@@ -51,13 +52,26 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public Queue emailNotificationQueue() {
-        return new Queue(EMAIL_NOTIFICATION_QUEUE, true);
+    public TopicExchange emailNotificationExchange() {
+        return new TopicExchange(EMAIL_NOTIFICATION_EXCHANGE);
     }
 
     @Bean
-    public TopicExchange emailNotificationExchange() {
-        return new TopicExchange(EMAIL_NOTIFICATION_EXCHANGE);
+    public Queue smsNotificationDelayQueue() {
+        return QueueBuilder.durable(SMS_NOTIFICATION_DELAY_QUEUE)
+                .withArgument("x-dead-letter-exchange", SMS_NOTIFICATION_EXCHANGE)
+                .withArgument("x-dead-letter-routing-key", SMS_NOTIFICATION_DELAY_ROUTING_KEY)
+                .withArgument("x-message-ttl", 10000) // 10 seconds delay
+                .build();
+    }
+
+    @Bean
+    public Queue emailNotificationDelayQueue() {
+        return QueueBuilder.durable(EMAIL_NOTIFICATION_DELAY_QUEUE)
+                .withArgument("x-dead-letter-exchange", EMAIL_NOTIFICATION_EXCHANGE)
+                .withArgument("x-dead-letter-routing-key", EMAIL_NOTIFICATION_DELAY_ROUTING_KEY)
+                .withArgument("x-message-ttl", 10000) // 10 seconds delay
+                .build();
     }
 
     @Bean
@@ -69,11 +83,24 @@ public class RabbitMQConfig {
                 .with(PAYMENT_AUDIT_ROUTING_KEY);
     }
 
-    /*
-     * =======================
-     * Flight Booking Audit
-     * ========================
-     */
+
+    @Bean
+    public Binding smsNotificationDelayBinding(
+            @Qualifier("smsNotificationDelayQueue") Queue smsDelayQueue,
+            @Qualifier("smsNotificationExchange") TopicExchange smsExchange) {
+        return BindingBuilder.bind(smsDelayQueue)
+                .to(smsExchange)
+                .with(SMS_NOTIFICATION_DELAY_ROUTING_KEY);
+    }
+
+    @Bean
+    public Binding emailNotificationDelayBinding(
+            @Qualifier("emailNotificationDelayQueue") Queue emailDelayQueue,
+            @Qualifier("emailNotificationExchange") TopicExchange emailExchange) {
+        return BindingBuilder.bind(emailDelayQueue)
+                .to(emailExchange)
+                .with(EMAIL_NOTIFICATION_DELAY_ROUTING_KEY);
+    }
 
     public static final String FLIGHT_BOOKING_AUDIT_QUEUE = "flight.booking.audit.queue";
     public static final String FLIGHT_BOOKING_AUDIT_EXCHANGE = "flight.booking.audit.exchange";
@@ -99,39 +126,8 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public Binding smsNotificationBinding(
-            @Qualifier("smsNotificationQueue") Queue smsQueue,
-            @Qualifier("smsNotificationExchange") TopicExchange smsExchange) {
-        return BindingBuilder.bind(smsQueue)
-                .to(smsExchange)
-                .with(SMS_NOTIFICATION_ROUTING_KEY);
-    }
-
-    @Bean
-    public Binding emailNotificationBinding(
-            @Qualifier("emailNotificationQueue") Queue emailQueue,
-            @Qualifier("emailNotificationExchange") TopicExchange emailExchange) {
-        return BindingBuilder.bind(emailQueue)
-                .to(emailExchange)
-                .with(EMAIL_NOTIFICATION_ROUTING_KEY);
-    }
-
-    /*
-     * =======================
-     * Common Beans
-     * ========================
-     */
-
-    @Bean
     public Jackson2JsonMessageConverter converter() {
         return new Jackson2JsonMessageConverter();
-    }
-
-    @Bean
-    public AmqpTemplate amqpTemplate(ConnectionFactory connectionFactory) {
-        RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
-        rabbitTemplate.setMessageConverter(converter());
-        return rabbitTemplate;
     }
 
     @Bean
