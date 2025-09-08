@@ -27,7 +27,9 @@ public class NotificationServiceImpl implements NotificationService {
     @Autowired
     private final NotificationRepository notificationRepository;
 
-    private final RabbitTemplate rabbitTemplate = RabbitMQConfig.rabbitTemplate();
+    @Autowired
+    private final RabbitTemplate rabbitTemplate ;
+
     private final LocalDateTime localDateTime = LocalDateTime.now();
 
     @Override
@@ -54,10 +56,10 @@ public class NotificationServiceImpl implements NotificationService {
 
         if (notificationType == NotificationType.EMAIL) {
             rabbitTemplate.convertAndSend(RabbitMQConfig.EMAIL_NOTIFICATION_EXCHANGE,
-                    RabbitMQConfig.EMAIL_NOTIFICATION_ROUTING_KEY, createdNotification);
+                    RabbitMQConfig.EMAIL_NOTIFICATION_DELAY_ROUTING_KEY, createdNotification);
         } else if (notificationType == NotificationType.SMS) {
             rabbitTemplate.convertAndSend(RabbitMQConfig.SMS_NOTIFICATION_EXCHANGE,
-                    RabbitMQConfig.SMS_NOTIFICATION_ROUTING_KEY, createdNotification);
+                    RabbitMQConfig.SMS_NOTIFICATION_DELAY_ROUTING_KEY, createdNotification);
         }
 
         return notification;
@@ -85,17 +87,11 @@ public class NotificationServiceImpl implements NotificationService {
             throw new RuntimeException("User not found with id: " + 2L);
         }
         for(int i = 0 ; i < 3000 ; i++){
-            notifications.add(Notification.builder()
-                    .message("This is a test notification " + i)
-                    .type(i % 2 == 0 ? NotificationType.EMAIL : NotificationType.SMS)
-                    .status(NotificationStatus.PENDING)
-                    .createdAt(localDateTime)
-                    .updatedAt(localDateTime)
-                    .user(user.get())
-                    .build());
+          Notification notification =  createNotification("Test message " + i, NotificationType.EMAIL, 2L);
+            notifications.add(notification);
         }
 
-        return notificationRepository.saveAll(notifications);
+        return notifications;
     }
 
 }
