@@ -1,7 +1,7 @@
 package com.example.modular_booking_system.flight_booking.service.handler;
 
 import com.example.modular_booking_system.core.config.RabbitMQConfig;
-import com.example.modular_booking_system.flight_booking.dto.BookingContext;
+import com.example.modular_booking_system.flight_booking.dto.BookingRequest;
 import com.example.modular_booking_system.external_api_integration.external_providers.amadeus.flight.pricing.service.AmadeusFlightPricingService;
 import com.example.modular_booking_system.external_api_integration.external_providers.amadeus.flight.pricing.service.FlightPriceExtractor;
 import com.example.modular_booking_system.flight_booking.service.FlightBookingAuditEventPublisher;
@@ -22,40 +22,40 @@ public class FlightPriceConfirmationHandler extends BookingHandler {
     private final FlightBookingAuditEventPublisher flightBookingAuditEventPublisher;
 
     @Override
-    public BookingContext handle(BookingContext context) {
+    public BookingRequest handle(BookingRequest bookingRequest) {
 
-        log.info("Confirming price for booking: {}", context.getBookingId());
+        log.info("Confirming price for booking: {}", bookingRequest.getBookingId());
 
         try {
             // Confirm price with Amadeus
-            JsonNode confirmedPrice = pricingService.confirmPrice(context.getFlightOffer());
+            JsonNode confirmedPrice = pricingService.confirmPrice(bookingRequest.getFlightOffer());
 
-            context.setFlightOfferPriceConfirmationResponse(confirmedPrice);
+            bookingRequest.setFlightOfferPriceConfirmationResponse(confirmedPrice);
             double flightBookingTotalPrice = flightPriceExtractor.extractTotalPrice(confirmedPrice);
-            context.getPaymentRequest().setTotal(flightBookingTotalPrice);
+            bookingRequest.getPaymentRequest().setTotal(flightBookingTotalPrice);
 
-            log.info("Price confirmed for booking: {}, amount: {}", context.getBookingId(), flightBookingTotalPrice);
+            log.info("Price confirmed for booking: {}, amount: {}", bookingRequest.getBookingId(), flightBookingTotalPrice);
 
-            context.setStatus("PRICE_CONFIRMED");
+            bookingRequest.setStatus("PRICE_CONFIRMED");
 
             // Publish audit event for price confirmed
             flightBookingAuditEventPublisher.publishFlightPriceConfirmed(
-                    context.getBookingId(),
+                    bookingRequest.getBookingId(),
                     "PRICE_CONFIRMED",
                     "FLIGHT_SERVICE",
                     RabbitMQConfig.FLIGHT_BOOKING_AUDIT_QUEUE,
-                    context,
+                    bookingRequest,
                     "SYSTEM",
-                    LocalDateTime.now()
+                    bookingRequest.getBookingTimestamp()
             );
 
-            return processNext(context);
+            return processNext(bookingRequest);
 
         } catch (Exception e) {
-            log.error("Error confirming price for booking: {}", context.getBookingId(), e);
-            context.setStatus("PRICE_CONFIRMATION_FAILED");
-            context.setErrorMessage(e.getMessage());
-            return context;
+            log.error("Error confirming price for booking: {}", bookingRequest.getBookingId(), e);
+            bookingRequest.setStatus("PRICE_CONFIRMATION_FAILED");
+            bookingRequest.setErrorMessage(e.getMessage());
+            return bookingRequest;
         }
     }
 }

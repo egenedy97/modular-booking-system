@@ -21,8 +21,14 @@ public class AuditLog {
 
     private String messageId;
     private String action;
+
+
     private String serviceName;
     private String topicName;
+
+
+//    private String serviceName;
+//    private String topicName;
 
     @Convert(converter = JsonNodeConverter.class)
     @Column(columnDefinition = "TEXT")

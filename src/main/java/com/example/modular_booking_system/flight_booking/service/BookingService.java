@@ -1,11 +1,13 @@
 package com.example.modular_booking_system.flight_booking.service;
 
-import com.example.modular_booking_system.flight_booking.dto.BookingContext;
+import com.example.modular_booking_system.flight_booking.dto.BookingRequest;
 import com.example.modular_booking_system.flight_booking.service.handler.FlightBookingHandler;
 import com.example.modular_booking_system.flight_booking.service.handler.PaymentCreationHandler;
 import com.example.modular_booking_system.flight_booking.service.handler.FlightPriceConfirmationHandler;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -17,19 +19,22 @@ public class BookingService {
 
 //    private final PaymentExecutionHandler paymentExecutionHandler;
 
-    public BookingContext initiateBooking(BookingContext context) {
+    public BookingRequest initiateBooking(BookingRequest bookingRequest) {
+
+        bookingRequest.setBookingTimestamp(LocalDateTime.now());
 
         // First chain: Price confirmation and payment creation
         flightPriceConfirmationHandler.setNext(paymentCreationHandler);
 
-        return flightPriceConfirmationHandler.handle(context);
+        return flightPriceConfirmationHandler.handle(bookingRequest);
     }
 
 
-    public BookingContext completeBooking(BookingContext context) {
+    public BookingRequest completeBooking(BookingRequest bookingRequest) {
+        bookingRequest.getPaymentDetails().setState("COMPLETED");
 
         // Second chain: flight booking
-        return flightBookingHandler.handle(context);
+        return flightBookingHandler.handle(bookingRequest);
     }
 }
 

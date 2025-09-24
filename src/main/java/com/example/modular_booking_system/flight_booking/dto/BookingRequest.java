@@ -5,11 +5,12 @@ import com.fasterxml.jackson.databind.JsonNode;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.time.LocalDateTime;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class BookingContext {
+public class BookingRequest {
 
     private String bookingId;
     private String userId;
@@ -25,4 +26,5 @@ public class BookingContext {
     private PaymentDetails paymentDetails;
     private String status;
     private String errorMessage;
+    private LocalDateTime bookingTimestamp;
 }

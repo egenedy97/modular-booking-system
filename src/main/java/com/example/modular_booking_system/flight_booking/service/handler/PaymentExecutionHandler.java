@@ -1,7 +1,7 @@
 package com.example.modular_booking_system.flight_booking.service.handler;
 
 import com.example.modular_booking_system.core.config.RabbitMQConfig;
-import com.example.modular_booking_system.flight_booking.dto.BookingContext;
+import com.example.modular_booking_system.flight_booking.dto.BookingRequest;
 import com.example.modular_booking_system.flight_booking.service.FlightBookingAuditEventPublisher;
 import com.example.modular_booking_system.payment.service.paypal.PayPalExecutePaymentService;
 import lombok.RequiredArgsConstructor;
@@ -20,35 +20,35 @@ public class PaymentExecutionHandler extends BookingHandler{
 
 
     @Override
-    public BookingContext handle(BookingContext context) {
+    public BookingRequest handle(BookingRequest bookingRequest) {
 
-        log.info("Executing payment for booking: {}", context.getBookingId());
+        log.info("Executing payment for booking: {}", bookingRequest.getBookingId());
 
         try {
             payPalExecutePaymentService.executePayment(
-                    context.getPaymentDetails().getId(),
-                    context.getPaymentDetails().getPayer().getPayerId());
+                    bookingRequest.getPaymentDetails().getId(),
+                    bookingRequest.getPaymentDetails().getPayer().getPayerId());
 
-            context.setStatus("PAYMENT_EXECUTED");
+            bookingRequest.setStatus("PAYMENT_EXECUTED");
 
             // Publish audit event for an excuted payment
             flightBookingAuditEventPublisher.publishPaymentExecuted(
-                    context.getBookingId(),
+                    bookingRequest.getBookingId(),
                     "PAYMENT_EXECUTED",
                     "FLIGHT_SERVICE",
                     RabbitMQConfig.FLIGHT_BOOKING_AUDIT_QUEUE,
-                    context,
+                    bookingRequest,
                     "SYSTEM",
-                    LocalDateTime.now()
+                    bookingRequest.getBookingTimestamp()
             );
 
-            return processNext(context);
+            return processNext(bookingRequest);
 
         } catch (Exception e) {
-            log.error("Error executing payment for booking: {}", context.getBookingId(), e);
-            context.setStatus("PAYMENT_EXECUTION_FAILED");
-            context.setErrorMessage(e.getMessage());
-            return context;
+            log.error("Error executing payment for booking: {}", bookingRequest.getBookingId(), e);
+            bookingRequest.setStatus("PAYMENT_EXECUTION_FAILED");
+            bookingRequest.setErrorMessage(e.getMessage());
+            return bookingRequest;
         }
     }
 }
