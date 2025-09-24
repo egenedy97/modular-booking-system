@@ -1,6 +1,6 @@
 package com.example.modular_booking_system.flight_booking.service.handler;
 
-import com.example.modular_booking_system.flight_booking.dto.BookingContext;
+import com.example.modular_booking_system.flight_booking.dto.BookingRequest;
 
 public abstract class BookingHandler {
 
@@ -11,14 +11,14 @@ public abstract class BookingHandler {
         return handler;
     }
 
-    public abstract BookingContext handle(BookingContext context);
+    public abstract BookingRequest handle(BookingRequest bookingRequest);
 
 
-    public BookingContext processNext(BookingContext context) {
+    public BookingRequest processNext(BookingRequest bookingRequest) {
         if (nextHandler != null) {
-            return nextHandler.handle(context);
+            return nextHandler.handle(bookingRequest);
         }
-        return context;
+        return bookingRequest;
     }
 
 }

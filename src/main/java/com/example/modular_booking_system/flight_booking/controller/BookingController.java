@@ -1,6 +1,6 @@
 package com.example.modular_booking_system.flight_booking.controller;
 
-import com.example.modular_booking_system.flight_booking.dto.BookingContext;
+import com.example.modular_booking_system.flight_booking.dto.BookingRequest;
 import com.example.modular_booking_system.flight_booking.service.BookingService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -15,24 +15,24 @@ public class BookingController {
 
     // localhost:8090/api/booking/initiate
     @PostMapping("/initiate")
-    public ResponseEntity<BookingContext> initiateBooking(@RequestBody BookingContext context, HttpServletRequest request) {
+    public ResponseEntity<BookingRequest> initiateBooking(@RequestBody BookingRequest bookingRequest, HttpServletRequest request) {
 
 
         String cancelUrl = getBaseUrl(request) + "/api/payment/cancel";
         String successUrl = getBaseUrl(request) + "/api/payment/success";
 
-        context.getPaymentRequest().setCancelUrl(cancelUrl);
-        context.getPaymentRequest().setSuccessUrl(successUrl);
+        bookingRequest.getPaymentRequest().setCancelUrl(cancelUrl);
+        bookingRequest.getPaymentRequest().setSuccessUrl(successUrl);
 
-        var result = bookingService.initiateBooking(context);
+        var result = bookingService.initiateBooking(bookingRequest);
         return ResponseEntity.ok(result);
     }
 
     // localhost:8090/api/booking/complete
     @PostMapping("/complete")
-    public ResponseEntity<BookingContext> completeBooking(@RequestBody BookingContext context) {
+    public ResponseEntity<BookingRequest> completeBooking(@RequestBody BookingRequest bookingRequest) {
 //        var context = bookingService.getBookingContext(bookingId);
-        var result = bookingService.completeBooking(context);
+        var result = bookingService.completeBooking(bookingRequest);
         return ResponseEntity.ok(result);
     }
 

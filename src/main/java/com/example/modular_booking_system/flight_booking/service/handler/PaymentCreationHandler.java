@@ -1,7 +1,7 @@
 package com.example.modular_booking_system.flight_booking.service.handler;
 
 import com.example.modular_booking_system.core.config.RabbitMQConfig;
-import com.example.modular_booking_system.flight_booking.dto.BookingContext;
+import com.example.modular_booking_system.flight_booking.dto.BookingRequest;
 import com.example.modular_booking_system.flight_booking.service.FlightBookingAuditEventPublisher;
 import com.example.modular_booking_system.payment.model.PaymentDetails;
 import com.example.modular_booking_system.payment.service.paypal.PayPalCreatePaymentService;
@@ -20,46 +20,46 @@ public class PaymentCreationHandler extends BookingHandler {
     private final FlightBookingAuditEventPublisher flightBookingAuditEventPublisher;
 
     @Override
-    public BookingContext handle(BookingContext context) {
+    public BookingRequest handle(BookingRequest bookingRequest) {
 
-        log.info("Creating payment for booking: {}", context.getBookingId());
+        log.info("Creating payment for booking: {}", bookingRequest.getBookingId());
 
         try {
             // Create payment with PayPal
             PaymentDetails paymentDetails = payPalCreatePaymentService.createPayment(
-                    context.getPaymentRequest().getTotal(),
-                    context.getPaymentRequest().getCurrency(),
-                    context.getPaymentRequest().getMethod(),
-                    context.getPaymentRequest().getIntent(),
-                    context.getPaymentRequest().getDescription(),
-                    context.getPaymentRequest().getCancelUrl(),
-                    context.getPaymentRequest().getSuccessUrl()
+                    bookingRequest.getPaymentRequest().getTotal(),
+                    bookingRequest.getPaymentRequest().getCurrency(),
+                    bookingRequest.getPaymentRequest().getMethod(),
+                    bookingRequest.getPaymentRequest().getIntent(),
+                    bookingRequest.getPaymentRequest().getDescription(),
+                    bookingRequest.getPaymentRequest().getCancelUrl(),
+                    bookingRequest.getPaymentRequest().getSuccessUrl()
             );
 
-            context.setPaymentDetails(paymentDetails);
-            context.setPaymentUrl(paymentDetails.getApprovalUrl());
-            context.setStatus("PAYMENT_CREATED");
+            bookingRequest.setPaymentDetails(paymentDetails);
+            bookingRequest.setPaymentUrl(paymentDetails.getApprovalUrl());
+            bookingRequest.setStatus("PAYMENT_CREATED");
 
-            log.info("Payment created for booking: {}, payment ID: {}", context.getBookingId(), paymentDetails.getId());
+            log.info("Payment created for booking: {}, payment ID: {}", bookingRequest.getBookingId(), paymentDetails.getId());
 
             // Publish audit event for created payment
             flightBookingAuditEventPublisher.publishPaymentCreated(
-                    context.getBookingId(),
+                    bookingRequest.getBookingId(),
                     "PAYMENT_CREATED",
                     "FLIGHT_SERVICE",
                     RabbitMQConfig.FLIGHT_BOOKING_AUDIT_QUEUE,
-                    context,
+                    bookingRequest,
                     "SYSTEM",
-                    LocalDateTime.now()
+                    bookingRequest.getBookingTimestamp()
             );
 
-            return processNext(context);
+            return processNext(bookingRequest);
 
         } catch (Exception e) {
-            log.error("Error creating payment for booking: {}", context.getBookingId(), e);
-            context.setStatus("PAYMENT_CREATION_FAILED");
-            context.setErrorMessage(e.getMessage());
-            return context;
+            log.error("Error creating payment for booking: {}", bookingRequest.getBookingId(), e);
+            bookingRequest.setStatus("PAYMENT_CREATION_FAILED");
+            bookingRequest.setErrorMessage(e.getMessage());
+            return bookingRequest;
         }
     }
 }
